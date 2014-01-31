@@ -15,6 +15,15 @@ navigate to the project folder and run the following to run the application:
 ###Installation
 To run this on our local machine, we will need the following:
 
+First, make sure your git is properly installed, and you have your ssh key configured for your machine.
+For help on this, go to the [Github help page](https://help.github.com/)
+That's also a good resource to figure out the git commands.
+
+To download this repo on to your machine, open your terminal, cd to where you want to place this project,
+and enter:
+
+`git clone git@github.com:SCastaneda/pathfinder.git`
+
 **Node** can be downloaded from its [offical website](http://nodejs.org/).
 Install node for your OS. Along with the installation of node, comes **npm**, which is 
 [node's package manager](https://npmjs.org/).
