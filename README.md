@@ -43,3 +43,5 @@ in the terminal. If you get an EACCESS error, try runnning it with
 `sudo npm install` to run it as the superuser (password entry will be required). I'm not sure if there's an equivalent for windows.
 
 Let Sam or **Patrick** know if you need help with any of the installations.
+
+Mark is testing
