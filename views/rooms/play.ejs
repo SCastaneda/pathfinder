@@ -10,6 +10,73 @@
 
 <script type="text/javascript">
 // put the js to manipulate the board here
+	function Square(id) {
+
+		// This holds the references to it's neighbors, we're going to start
+		// with this not sorted in any way
+		this.neighbors = new Array();
+		var exit = false;
+
+		// Creates an edge
+		this.addNeighbor = function(neighbor) {
+			this.neighbors.push(neighbor);
+		}
+
+		// Removes the edges, after checking if it exists
+		this.removeNeighbor = function(neighbor) {
+			var index = this.neighbors.indexOf(neighbor);
+			if (index > -1) this.neighbors.splice(index, 1);
+		}
+
+		// Returns true if there is an edge, false otherwise
+		this.hasEdge = function(otherSquare) {
+			return (this.neighbors.indexOf(otherSquare) > -1);
+		}
+
+		// Simple getter for the ID
+		this.getId = function() {
+			return id;
+		}
+
+		this.makeExit = function() {
+			exit = true;
+		}
+
+		this.isExit = function() {
+			return exit;
+		}
+	}
+
+	function Maze(size) {
+		// Maze object
+
+		// Size refers to the how tall/wide it will be. I'm just going to assume
+		// it will be a square for now
+
+		var squares = new Array(size*size);
+
+		// First, create each square object
+		for (int i = 0; i < size*size; i++) {
+			squares[i] = new Square(i);
+		}
+
+		// Now we go through and set up the initial edges
+		// Since each square starts off adjacent to each square 
+		for (int i = 0; i < size*size; i++) {
+			// Check if the edge is on the right edge, as they don't have a friend to
+			// their right if so
+			if ((i+1) % size !== 0) {
+				squares[i].addNeighbor(squares[i+1]);
+				squares[i+1].addNeighbor(squares[i]);
+			}
+
+			// Check if the edge is on the bottom edge
+			if (i < (size*size) - size) {
+				squares[i].addNeighbor(squares[i+size]);
+				squares[i+size].addNeighbor(squares[i]);
+			}
+		}
+	}
 
 
 </script>
