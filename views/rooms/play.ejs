@@ -1,15 +1,64 @@
 <h1>Game Room</h1>
-<p>We will have the js in the wait room redirect people here
+<p>We will have the js in the wait room redirect people here</p>
+
+<input type="number" id="dim"> 
+<button onclick="generate_board(document.getElementById('dim').value)">Generate</button>
+
 
 <!-- Put the html for the game-board here :-->
-
-
-
-
-
+<div id="board">
+</div>
 
 <script type="text/javascript">
 // put the js to manipulate the board here
 
+// generates the visual board in html
+function generate_board(dim) {
+    var square = '<div class="square"></div>';
+    var wall_h = '<div class="wall wall-horizontal"></div>';
+    var wall_v = '<div class="wall wall-vertical"></div>';
+    var spacer = '<div class="spacer"></div>';
+
+    var board = '';
+
+    for(var i = 0; i < dim; i++) {
+        var row = '';
+    
+        // row of walls
+        for(var j = 0; j < dim; j++) {
+            row += spacer + wall_h;
+        }
+        row += spacer;
+        board += '<div class="row row-walls">' + row + '</div>';
+    
+
+        row = '';
+        // row of squares
+        for(var j = 0; j < dim; j++) {
+            row += wall_v + square;
+        }
+        
+        row += wall_v;
+        board += '<div class="row row-squares">' + row + '</div>';
+        
+    }
+
+    var row = '';
+    
+    // row of walls
+    for(var j = 0; j < dim; j++) {
+        row += spacer + wall_h;
+    }
+    row += spacer;
+    board += '<div class="row row-walls">' + row + '</div>';
+
+    document.getElementById('board').innerHTML = board;
+}
+
+
+
 
 </script>
+
+
+
