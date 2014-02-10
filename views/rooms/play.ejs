@@ -54,15 +54,16 @@
 		// it will be a square for now
 
 		var squares = new Array(size*size);
+		var current
 
 		// First, create each square object
-		for (int i = 0; i < size*size; i++) {
+		for (var i = 0; i < size*size; i++) {
 			squares[i] = new Square(i);
 		}
 
 		// Now we go through and set up the initial edges
 		// Since each square starts off adjacent to each square 
-		for (int i = 0; i < size*size; i++) {
+		for (var i = 0; i < size*size; i++) {
 			// Check if the edge is on the right edge, as they don't have a friend to
 			// their right if so
 			if ((i+1) % size !== 0) {
@@ -76,6 +77,9 @@
 				squares[i+size].addNeighbor(squares[i]);
 			}
 		}
+
+		
+
 	}
 
 
