@@ -16,6 +16,7 @@
 		// with this not sorted in any way
 		this.neighbors = new Array();
 		var exit = false;
+		var start = false;
 
 		// Creates an edge
 		this.addNeighbor = function(neighbor) {
@@ -38,12 +39,20 @@
 			return id;
 		}
 
-		this.makeExit = function() {
-			exit = true;
+		this.toggleExit = function() {
+			exit = !exit;
+		}
+
+		this.toggleStart = function() {
+			start = !start;
 		}
 
 		this.isExit = function() {
 			return exit;
+		}
+
+		this.isStart = function() {
+			return start;
 		}
 	}
 
@@ -54,16 +63,28 @@
 		// it will be a square for now
 
 		var squares = new Array(size*size);
-		var current
+		var current;
+		var start, exit;
 
 		// First, create each square object
 		for (var i = 0; i < size*size; i++) {
 			squares[i] = new Square(i);
+
+			// Defaults for start and end square.
+			if (i === 0) {
+				squares[i].toggleStart();
+				start = squares[i];
+			}
+			if (i === size-1) {
+				squares[i].toggleExit();
+				exit = squares[i];
+			}
 		}
 
 		// Now we go through and set up the initial edges
 		// Since each square starts off adjacent to each square 
 		for (var i = 0; i < size*size; i++) {
+
 			// Check if the edge is on the right edge, as they don't have a friend to
 			// their right if so
 			if ((i+1) % size !== 0) {
@@ -78,7 +99,32 @@
 			}
 		}
 
-		
+		this.verify = function() {
+			var visited = new Array();
+			for (var i = 0; i < size*size; i++) {
+				visited[i] = false;
+			}
+
+			var stack = [new Array();
+			stack.push(start);
+
+			while (stack.length > 0) {
+				var current = stack.pop();
+				visited[current.getId()] = true;
+
+				if (current === exit) {
+					return true;
+				}
+				
+				for (var i = 0; i < current.neighbors.length; i++) {
+					if (!visited[current.neighbors[i].getId()]) {
+						stack.push(current.neighbors[i].getId());
+					}
+				}
+			}
+
+			return false;
+		}
 
 	}
 
