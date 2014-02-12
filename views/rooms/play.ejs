@@ -10,77 +10,71 @@
 </div>
 
 <script type="text/javascript">
-// put the js to manipulate the board here
 
-// generates the visual board in html
+	// generates the visual board in html
 	function generate_board(dim) {
-	    var square = '<div class="square"></div>';
-	    var wall_h_start = '<div onclick="toggle(this)" class="wall wall-horizontal"'
-	    var wall_h_end = '></div>';
+		var current_id = 0;
 
-	    var wall_h_red = '<div class="wall wall-horizontal red"></div>';
+		for(var i = 0; i < dim; i++) {
+			// This is the div to hold the row of spacers and walls
+			var $wall_row = $("<div>", {class: "row row-walls"});
 
-	    var wall_v_start= '<div onclick="toggle(this)" class="wall wall-vertical"'
-	    var wall_v_end = '></div>';
+			for (var j = 0; j < dim; j++) {
+				if (i === 0) {
+					// if it's the very first row, then these need to be all red
+					$($wall_row).append($("<div>", {class: "spacer"}), $("<div>", {class: "wall wall-horizontal red"}));
+				} else {
+					// otherwise the walls are grey, are assigned an ID, and get the function attached if they are clicked
+					var wall = $("<div>", {class: "wall wall-horizontal", id: current_id}).click(toggle);
+					$($wall_row).append($("<div>", {class: "spacer"}), wall);
+					current_id++;
+				}
+			}
+			// final spacer is added
+			$($wall_row).append($("<div>", {class: "spacer"}));
 
-	    var wall_v_red = '<div class="wall wall-vertical red"></div>';
-	    var spacer = '<div class="spacer"></div>';
+			// This is the div to hold the row of walls and squares
+			var $wall_square = $("<div>", {class: "row row-squares"});
 
-	    var board = '';
+			for (var j = 0; j < dim; j++) {
+				if (j === 0) {
+					// The far left wall needs to be perma red
+					$($wall_square).append($("<div>", {class: "wall wall-vertical red"}), $("<div>", {class: "square"}));
+				} else {
+					// Otherwise walls need to be grey, assigned an ID, and get the fucntion attached if they are clicked
+					var $wall = $("<div>", {class: "wall wall-vertical", id: current_id}).click(toggle);
+					$($wall_square).append($wall, $("<div>", {class: "square"}));
+					current_id++;
+				}
+			}
+			// final wall, it's perma red and non-clickable
+			$($wall_square).append($("<div>", {class: "wall wall-vertical red"}));
 
-	    var current_id = 0;
-
-	    for(var i = 0; i < dim; i++) {
-	        var row = '';
-	    
-	        // row of walls
-	        for(var j = 0; j < dim; j++) {
-	        	if (i === 0) {
-	        		row += spacer + wall_h_red;
-	        	} else {
-	        		row += spacer + wall_h_start + 'id="' + current_id + '"' + wall_h_end;
-	        	}
-	            
-	        }
-	        row += spacer;
-	        board += '<div class="row row-walls">' + row + '</div>';
-	    
-
-	        row = '';
-	        // row of squares
-	        for(var j = 0; j < dim; j++) {
-	        	if (j === 0) {
-	        		row += wall_v_red + square;
-	        	} else {
-	        		row += wall_v_start + 'id="' + current_id + '"' + wall_v_end + square;
-	        	}   
-	        }
-	        
-	        row += wall_v_red;
-	        board += '<div class="row row-squares">' + row + '</div>';
-	        
-	    }
-
-	    var row = '';
-	    
-	    // row of walls
-	    for(var j = 0; j < dim; j++) {
-	        row += spacer + wall_h_red;
-	    }
-	    row += spacer;
-	    board += '<div class="row row-walls">' + row + '</div>';
-
-	    document.getElementById('board').innerHTML = board;
-	}
-
-	function toggle(obj) {
-		if ($(obj).hasClass("red")) {
-			$(obj).removeClass("red");
-		} else {
-			$(obj).addClass("red");
+			// add the two rows to the board
+			$("#board").append($wall_row, $wall_square)
 		}
+
+		// final row of spacers and walls here, identical to the very first row
+		var $final_row = $("<div>", {class: "row row-walls"});
+		for(var i = 0; i < dim; i++) {
+			$($final_row).append($("<div>", {class: "spacer"}), $("<div>", {class: "wall wall-horizontal red"}));
+		}
+		$($final_row).append($("<div>", {class: "spacer"}));
+		$("#board").append($final_row);
 	}
 
+	// This function will handle all the clicks on the HTML elements
+	function toggle(event) {
+		var target = event.currentTarget;
+		if ($(target).hasClass("red")) {
+			$(target).removeClass("red");
+		} else {
+			$(target).addClass("red");
+		}
+
+		var id = $(target).attr("id")
+		console.log(id);
+	}
 
 	function Square(id) {
 
