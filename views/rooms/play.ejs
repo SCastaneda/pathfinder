@@ -15,13 +15,20 @@
 // generates the visual board in html
 	function generate_board(dim) {
 	    var square = '<div class="square"></div>';
-	    var wall_h = '<div onclick="toggle(this)" class="wall wall-horizontal"></div>';
+	    var wall_h_start = '<div onclick="toggle(this)" class="wall wall-horizontal"'
+	    var wall_h_end = '></div>';
+
 	    var wall_h_red = '<div class="wall wall-horizontal red"></div>';
-	    var wall_v = '<div onclick="toggle(this)" class="wall wall-vertical"></div>';
+
+	    var wall_v_start= '<div onclick="toggle(this)" class="wall wall-vertical"'
+	    var wall_v_end = '></div>';
+
 	    var wall_v_red = '<div class="wall wall-vertical red"></div>';
 	    var spacer = '<div class="spacer"></div>';
 
 	    var board = '';
+
+	    var current_id = 0;
 
 	    for(var i = 0; i < dim; i++) {
 	        var row = '';
@@ -31,7 +38,7 @@
 	        	if (i === 0) {
 	        		row += spacer + wall_h_red;
 	        	} else {
-	        		row += spacer + wall_h;
+	        		row += spacer + wall_h_start + 'id="' + current_id + '"' + wall_h_end;
 	        	}
 	            
 	        }
@@ -45,7 +52,7 @@
 	        	if (j === 0) {
 	        		row += wall_v_red + square;
 	        	} else {
-	        		row += wall_v + square;
+	        		row += wall_v_start + 'id="' + current_id + '"' + wall_v_end + square;
 	        	}   
 	        }
 	        
