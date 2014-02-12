@@ -21,6 +21,7 @@
 
     socket.on('update_total', display_total);
     socket.on('start_game', join_game);
+    socket.on('disconnect', go_home);
 
     function display_total(data) {
         document.getElementById('total_users').innerHTML = data.count; 
@@ -29,6 +30,10 @@
     function join_game(data) {
         // redirect the user to their game room
         window.location.replace("/play/" + data.hash);
+    }
+
+    function go_home(data) {
+        window.location.replace("/");
     }
 
 </script>

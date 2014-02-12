@@ -12,6 +12,8 @@
     "css": "*",
     "socket.io" : "0.9.*",
     "mongoose" : "3.8.*",
-    "bcrypt" : "0.7.*"
+    "bcrypt" : "0.7.*",
+    "session.socket.io" : "0.1.*",
+    "connect" : "2.12.*"
   }
 }
