@@ -48,3 +48,11 @@ a {
 .red {
     background-color: #e74c3c;
 }
+
+.start {
+    background-color: Green;
+}
+
+.end {
+    background-color: Gold;
+}
