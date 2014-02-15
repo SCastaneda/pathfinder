@@ -6,3 +6,53 @@ body {
 a {
   color: #00B7FF;
 }
+
+.row.row-walls {
+    height: 20px;
+}
+
+.row.row-squares {
+    height: 50px;
+}
+
+.square {
+    width: 50px;
+    height: 50px;
+    background-color: #2980b9;
+    display: inline-block;
+}
+
+.wall {
+    background-color: #7f8c8d;
+    display: inline-block;
+}
+
+.wall.wall-horizontal {
+    width: 50px;
+    height: 20px;
+}
+
+.wall.wall-vertical {
+    width: 20px;
+    height: 50px;
+}
+
+.spacer {
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+
+    background-color: #e74c3c;
+}
+
+.red {
+    background-color: #e74c3c;
+}
+
+.start {
+    background-color: Green;
+}
+
+.end {
+    background-color: Gold;
+}
