@@ -61,7 +61,7 @@ var server = http.createServer(app).listen(app.get('port'), function(){
 });
 
 
-
-waiting_room.start(server, cookieParser, sessionStore);
+var io = require("socket.io").listen(server);
+waiting_room.start(io, cookieParser, sessionStore);
 
 
