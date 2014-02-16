@@ -55,22 +55,49 @@ exports.start = function(io, cookieParser, sessionStore) {
 
     }
 
+    // checks the waiting room to see if 2 or more user are there, and dispatches them to a game.
+    // this gets called everytime a new user joins the waiting room.
+    function dispatch() {
+        if(all_users_waiting.length > 1) {
+            var player1 = all_users_waiting[0];
+            var player2 = all_users_waiting[1];
+
+            db_room.create_room(player1.name, player2.name, function(hash) {
+                player1.socket.emit('dispatch_to_game', { hash: hash });
+                player2.socket.emit('dispatch_to_game', { hash: hash });
+            });
+            
+        }
+    }
+
     function join_room(room, session, socket, user) {
+        if(!session.name) {
+            return socket.emit('disconnect', {});
+        }
+
+
         if(room == 'waiting') {
             // joins user to the waiting room, and dispatches 2 users to a game
             join_waiting(socket, user);
         } else {
             // validate that room exists
             // validate that user is allowed to join room
+            db_room.validate_player(user.name, room, function(status, message) {
+                if(status === true) {
+                    // once validated, we allow the users to join the room
+                    socket.join(room);
+                    user.room = room;
+                    all_users_playing.push(user);
+                    console.log(all_users_playing);
+                    console.log(user.name + "allowed in room " + room + ": " + message );
 
-            // once validated, we allow the users to join the room
-            socket.join(room);
-            user.room = room;
-            all_users_playing.push(user);
-
-            // once we have both players in the room, we start the create maze phase
-            socket.emit('start_create_maze_phase', { maze_dim: maze_size });
-
+                    // once we have both players in the room, we start the create maze phase
+                    socket.emit('start_create_maze_phase', { maze_dim: maze_size });
+                } else {
+                    user.socket.emit('disconnect', {});
+                    console.log(message);
+                }
+            });
         }
     }
 
@@ -169,11 +196,7 @@ exports.start = function(io, cookieParser, sessionStore) {
                 user.room = 'waiting';
                 console.log(all_users_waiting);
 
-                if(all_users_waiting.length > 1) {
-                    // grab 2 users, make a unique hash for them, 
-                    // and redirect them to their game room
-
-                }
+                dispatch();
 
             } else {
                 console.log("already have socket, not added");

@@ -21,8 +21,8 @@
 <script src="/socket.io/socket.io.js"></script>
 <script type="text/javascript">
     var socket = io.connect("");
-
     socket.emit('join_room', {room: '<%= room %>'});
+
     socket.on('disconnect', go_home);
     socket.on('start_create_maze_phase', function(data) {
     	generate_board(data['maze_dim']);
@@ -39,6 +39,10 @@
     	$('#ready_btn').html('waiting on the other player!');
     	$('#ready_btn').attr('disabled', 'disabled');
     	$('#announcements').html('waiting on the other player...');
+    });
+
+    socket.on('start_play_phase', function(data) {
+    	$('#announcements').html("Play phase started!");
     });
 
 

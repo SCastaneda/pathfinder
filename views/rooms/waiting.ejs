@@ -18,7 +18,9 @@
 
     // e.g. every time a new user joins/leaves the waiting room, 
     // we update the total of users in here
-    socket.emit('join_room', {room: 'waiting'});
+    $(document).ready(function() {
+        socket.emit('join_room', {room: 'waiting'});
+    });
 
     socket.on('update_total', display_total);
     socket.on('dispatch_to_game', join_game);
