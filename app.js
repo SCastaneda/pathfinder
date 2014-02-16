@@ -11,7 +11,7 @@ var partials = require('express-partials');
 
 var routes   = require('./routes');
 var room     = require('./routes/room');
-var waiting_room = require('./waiting');
+var game_sockets = require('./game-sockets');
 
 var app = express();
 
@@ -62,6 +62,6 @@ var server = http.createServer(app).listen(app.get('port'), function(){
 
 
 var io = require("socket.io").listen(server);
-waiting_room.start(io, cookieParser, sessionStore);
+game_sockets.start(io, cookieParser, sessionStore);
 
 
