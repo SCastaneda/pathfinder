@@ -215,7 +215,7 @@ function Maze(dim) {
             squares[i].makeStart();
             start = squares[i];
         }
-        if (i === size-1) {
+        if (i === (size*size)-1) {
             squares[i].makeEnd();
             end = squares[i];
         }
