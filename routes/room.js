@@ -24,5 +24,5 @@ exports.play = function(req, res) {
     // that no 2 others are already playing in it.
 
     // serves the page in 'view/rooms/play.ejs' 
-    res.render('rooms/play', {});
+    res.render('rooms/play', {name: req.session.name, room: hash });
 };
