@@ -30,20 +30,20 @@ exports.validate_player = function(player, hash, cb) {
     roomModel.findOne({hash: hash}, function(err, room) {
         if(err) { throw err; }
         if(room == null) {
+            console.log(player+" room is null");
             return cb(false, "room does not exist");
         }
 
         if(room.winner !== '') {
+            console.log(player + " is winning");
             return cb(false, "game already completed");
         }
 
         if(room.player1 === player || room.player2 === player) {
             console.log(player + " allowed: " + room.player1 + " " + room.player2);
-            cb(true, "player allowed");
+            return cb(true, "player allowed");
         }
-
-
-
+        return cb(false, "player not allowed");
     });
 
 }
