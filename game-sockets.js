@@ -71,6 +71,7 @@ exports.start = function(io, cookieParser, sessionStore) {
     }
 
     function join_room(room, session, socket, user) {
+        console.log(session.name);
         if(!session.name) {
             return socket.emit('disconnect', {});
         }
@@ -82,22 +83,14 @@ exports.start = function(io, cookieParser, sessionStore) {
         } else {
             // validate that room exists
             // validate that user is allowed to join room
-            db_room.validate_player(user.name, room, function(status, message) {
-                if(status === true) {
-                    // once validated, we allow the users to join the room
-                    socket.join(room);
-                    user.room = room;
-                    all_users_playing.push(user);
-                    console.log(all_users_playing);
-                    console.log(user.name + "allowed in room " + room + ": " + message );
+            socket.join(room);
+            user.room = room;
+            all_users_playing.push(user);
+            console.log(all_users_playing);
 
-                    // once we have both players in the room, we start the create maze phase
-                    socket.emit('start_create_maze_phase', { maze_dim: maze_size });
-                } else {
-                    user.socket.emit('disconnect', {});
-                    console.log(message);
-                }
-            });
+
+            // once we have both players in the room, we start the create maze phase
+            socket.emit('start_create_maze_phase', { maze_dim: maze_size });
         }
     }
 

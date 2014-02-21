@@ -3,7 +3,7 @@
     will be put in the {} braces as the 2nd argument 
     to the render function, as a 'key: value' pair (without the quotes)
 */
-
+var db_room = require("../db/rooms");
 
 
 exports.waiting = function(req, res){
@@ -22,7 +22,14 @@ exports.play = function(req, res) {
 
     // first, check if the hash is a valid hash and 
     // that no 2 others are already playing in it.
-
-    // serves the page in 'view/rooms/play.ejs' 
-    res.render('rooms/play', {name: req.session.name, room: hash });
+    db_room.validate_player(req.session.name, hash, function(status, message) {
+        if (status === true) {
+            // serves the page in 'view/rooms/play.ejs'
+            console.log(req.session.name + " allowed in room " + hash + ": " + message);
+            res.render('rooms/play', {name: req.session.name, room: hash });
+        } else {
+            res.redirect('/ready');
+        }
+    });
+    
 };
