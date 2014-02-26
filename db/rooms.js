@@ -6,21 +6,27 @@ var roomSchema  = new Schema({
                             player1:    String,
                             player2:    String,
                             hash:       String,
-                            start_date: {   
+                            start_date: {
                                 type: String, 
                                 default: Date.now 
                             },
-                            num_ready: {
-                                type: Number,
+                            player1_ready {
+                                type: Boolean
+                                default: 0
+                            },
+                            player2_ready {
+                                type: Boolean 
                                 default: 0
                             },
                             winner: {
                                 type: String,
                                 default: ''
                             },
+                            // 0 -> create maze phase
+                            // 1 -> game phase
                             current_phase: {
-                                type: String, 
-                                default: ''
+                                type: Number,
+                                default: 0
                             }
                         });
 
