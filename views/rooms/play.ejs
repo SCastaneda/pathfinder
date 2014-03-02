@@ -8,13 +8,13 @@
 
 
 <script type="text/javascript">
-	function toggle_ready_button(state) {
-		if(state) {
-			$('#ready_btn').removeAttr('disabled');
-		} else {
-			$('#ready_btn').attr('disabled', 'disabled');
-		}
-	}
+    function toggle_ready_button(state) {
+        if(state) {
+            $('#ready_btn').removeAttr('disabled');
+        } else {
+            $('#ready_btn').attr('disabled', 'disabled');
+        }
+    }
 
 </script>
 <script src='/javascripts/maze.js'></script>
@@ -25,24 +25,24 @@
 
     socket.on('disconnect', go_home);
     socket.on('start_create_maze_phase', function(data) {
-    	generate_board(data['maze_dim']);
-    	$('#announcements').html("Build your maze, and click 'I'm ready', when you're done!");
+        generate_board(data['maze_dim']);
+        $('#announcements').html("Build your maze, and click 'I'm ready', when you're done!");
     });
 
     $('#ready_btn').on('click', function() {
-    	// validate maze on server side
-    	// if it has been validated, we can emit 'player_ready'
-    	socket.emit('player_ready', {name: "<%= name %>", room: "<%= room %>"});
+        // validate maze on server side
+        // if it has been validated, we can emit 'player_ready'
+        socket.emit('player_ready', {name: "<%= name %>", room: "<%= room %>"});
     });
 
     socket.on('waiting_on_other_player', function() {
-    	$('#ready_btn').html('waiting on the other player!');
-    	$('#ready_btn').attr('disabled', 'disabled');
-    	$('#announcements').html('waiting on the other player...');
+        $('#ready_btn').html('waiting on the other player!');
+        $('#ready_btn').attr('disabled', 'disabled');
+        $('#announcements').html('waiting on the other player...');
     });
 
     socket.on('start_play_phase', function(data) {
-    	$('#announcements').html("Play phase started!");
+        $('#announcements').html("Play phase started!");
     });
 
 

@@ -35,11 +35,11 @@ exports.start = function(io, cookieParser, sessionStore) {
 
         // event for user clicking the ready button
         socket.on('player_ready', function(data) {
-            db_room.player_ready(data['name'], data['room'], function(num_ready, player1, player2) {
+            db_room.player_ready(data['name'], data['room'], function(both_ready, player1, player2) {
                 socket.emit('waiting_on_other_player', {});
 
                 // if we have both players ready, we start the 'play' phase
-                if(num_ready == 2) {
+                if(both_ready) {
                     get_user_by_name(player1, function(player) {
                         player.socket.emit('start_play_phase', {});
                     });

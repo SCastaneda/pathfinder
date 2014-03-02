@@ -10,12 +10,12 @@ var roomSchema  = new Schema({
                                 type: String, 
                                 default: Date.now 
                             },
-                            player1_ready {
-                                type: Boolean
+                            player1_ready: {
+                                type: Boolean,
                                 default: 0
                             },
-                            player2_ready {
-                                type: Boolean 
+                            player2_ready: {
+                                type: Boolean,
                                 default: 0
                             },
                             winner: {
@@ -65,18 +65,37 @@ exports.player_ready = function(player, hash, cb) {
             return cb(false);
         }
 
-        var new_num_ready = room.num_ready+1;
+        if(player === room.player1) {
+            
+            roomModel.update({hash: hash}, {player1_ready: true}, function(err, numAffected, raw) {
+                if(err) {
+                    cb(false);
+                    console.log("Error: " + err);
+                }
 
+                if(room.player2_ready) {
+                    return cb(true, room.player1, room.player2);
+                } else {
+                    return cb(false);
+                }
+            });
 
-        roomModel.update({hash: hash}, {num_ready: new_num_ready}, function(err, numberAffected, raw) {
-            if(err) {
-                cb(false); 
-                throw err;
-            }
-            console.log("Room "+ hash+ " number of players ready: " + new_num_ready);
-            return cb(new_num_ready, room.player1, room.player2);
-        });
+        } else if(player === room.player2) {
+            roomModel.update({hash: hash}, {player2_ready: true}, function(err, numAffected, raw) {
+                if(err) {
+                    cb(false);
+                    console.log("Error: " + err);
+                }
 
+                if(room.player1_ready) {
+                    return cb(true, room.player1, room.player2);
+                } else {
+                    return cb(false);
+                }
+            });
+        } else {
+            return cb(false);
+        }
     });
 }
 
