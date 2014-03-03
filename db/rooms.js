@@ -54,6 +54,24 @@ exports.validate_player = function(player, hash, cb) {
 
 }
 
+exports.switch_game_phase = function(hash, phase) {
+    roomModel.findOne({hash: hash}, function(err, room){
+        if(err) {
+            throw err;
+        }
+        if(room !== null) {
+            roomModel.update({hash: hash}, {current_phase: phase}, function(err, numAffected, raw) {
+                if(err) {
+                    throw err;
+                }
+
+                console.log("room " + hash + " switched game phase to phase number: " + phase);
+            });
+        }
+
+    });
+}
+
 
 exports.player_ready = function(player, hash, cb) {
     roomModel.findOne({hash: hash}, function(err, room) {

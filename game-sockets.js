@@ -38,8 +38,16 @@ exports.start = function(io, cookieParser, sessionStore) {
             db_room.player_ready(data['name'], data['room'], function(both_ready, player1, player2) {
                 socket.emit('waiting_on_other_player', {});
 
+                console.log("MAZE:\n");
+                console.log(data["maze"]);
+                console.log("\nEDGE_MAP:\n");
+                console.log(data["edge_map"]);
+
                 // if we have both players ready, we start the 'play' phase
                 if(both_ready) {
+                    // 2 is the game phase
+                    db_room.switch_game_phase(data["room"], 2);
+
                     get_user_by_name(player1, function(player) {
                         player.socket.emit('start_play_phase', {});
                     });
@@ -47,6 +55,8 @@ exports.start = function(io, cookieParser, sessionStore) {
                     get_user_by_name(player2, function(player) {
                         player.socket.emit('start_play_phase', {});
                     });
+
+
                 }
 
 
@@ -65,6 +75,8 @@ exports.start = function(io, cookieParser, sessionStore) {
             db_room.create_room(player1.name, player2.name, function(hash) {
                 player1.socket.emit('dispatch_to_game', { hash: hash });
                 player2.socket.emit('dispatch_to_game', { hash: hash });
+
+                console.log("DISPATCHED " + player1.name + " AND " + player2.name + " to room " + hash);
             });
             
         }
@@ -86,6 +98,7 @@ exports.start = function(io, cookieParser, sessionStore) {
             socket.join(room);
             user.room = room;
             all_users_playing.push(user);
+            console.log("ALL USERS PLAYING:\n");
             console.log(all_users_playing);
 
 
@@ -181,12 +194,12 @@ exports.start = function(io, cookieParser, sessionStore) {
             if(!user_already_here) {
                 console.log(user.name + " connected");
                 all_users_waiting.push(user);
-                console.log(all_users_waiting);
 
                 // all users initially join the waiting room
                 socket.join('waiting');
                 io.sockets.in('waiting').emit('update_total', { count: all_users_waiting.length });
                 user.room = 'waiting';
+                console.log("ALL USERS WAITING:\n");
                 console.log(all_users_waiting);
 
                 dispatch();

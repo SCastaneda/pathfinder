@@ -200,6 +200,7 @@ function Maze(dim) {
     // Size refers to the how tall/wide it will be. I'm just going to assume
     // it will be a square for now
     var size = parseInt(dim);
+    this.dim = size;
     // console.log(size);
     var squares = new Array(size*size);
     var current;
@@ -239,6 +240,10 @@ function Maze(dim) {
         }
     }
 
+    this.getSquares = function() {
+        return squares;
+    }
+
     this.removeStart = function() {
         start.removeStart();
         start = null;
@@ -262,11 +267,13 @@ function Maze(dim) {
     this.removeEdge = function(a, b) {
         squares[a].removeNeighbor(squares[b]);
         squares[b].removeNeighbor(squares[a]);
+        remove_edge_from_map(a, b);
     }
 
     this.addEdge = function(a, b) {
         squares[a].addNeighbor(squares[b]);
         squares[b].addNeighbor(squares[a]);
+        add_edge_to_map(a, b);
     }
 
     this.verify = function() {
@@ -300,6 +307,30 @@ function Maze(dim) {
         return false;
     }
 }
+
+function remove_edge_from_map(a,b) {
+    var n = edge_map.length;
+    
+    for(var i = 0; i < n; i++){
+        if(edge_map[i].a == a && edge_map[i].b == b) {
+            edge_map.splice(i, 1);
+            return;
+        } else if(edge_map[i].a == b && edge_map[i].b == a) {
+            edge_map.splice(i, 1);
+            return;
+        } 
+    }
+    console.log("Trying to remove invalid edge");
+}
+
+function add_edge_to_map(a,b) {
+    if(a<b) {
+        edge_map.push({ a:a, b:b });
+    } else {
+        edge_map.push({ a:b, b:a });
+    }
+    console.log(edge_map);
+} 
 
 function make_edge_Map(dim) {
     var size = parseInt(dim);
