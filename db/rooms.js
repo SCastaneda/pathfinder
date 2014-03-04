@@ -18,6 +18,9 @@ var roomSchema  = new Schema({
                                 type: Boolean,
                                 default: 0
                             },
+                            // player 1 plays on player2's board and vice-versa
+                            player1_board: [Schema.Types.Mixed],
+                            player2_board: [Schema.Types.Mixed],
                             winner: {
                                 type: String,
                                 default: ''
@@ -73,7 +76,9 @@ exports.switch_game_phase = function(hash, phase) {
 }
 
 
-exports.player_ready = function(player, hash, cb) {
+// maze will be the maze submitted by the player object looks like so:
+// {maze: connected nodes, start: number, end: number}
+exports.player_ready = function(player, hash, maze, cb) {
     roomModel.findOne({hash: hash}, function(err, room) {
         if(err) {
             throw err;
@@ -85,7 +90,7 @@ exports.player_ready = function(player, hash, cb) {
 
         if(player === room.player1) {
             
-            roomModel.update({hash: hash}, {player1_ready: true}, function(err, numAffected, raw) {
+            roomModel.update({hash: hash}, {player1_ready: true, player1_board: maze}, function(err, numAffected, raw) {
                 if(err) {
                     cb(false);
                     console.log("Error: " + err);
@@ -99,7 +104,7 @@ exports.player_ready = function(player, hash, cb) {
             });
 
         } else if(player === room.player2) {
-            roomModel.update({hash: hash}, {player2_ready: true}, function(err, numAffected, raw) {
+            roomModel.update({hash: hash}, {player2_ready: true, player2_board: maze}, function(err, numAffected, raw) {
                 if(err) {
                     cb(false);
                     console.log("Error: " + err);
@@ -139,5 +144,4 @@ function create_hash(player1, player2, cb) {
     md5.update(Date.now().toString());
     cb(md5.digest('hex'));
 }
-
 

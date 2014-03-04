@@ -35,36 +35,55 @@ exports.start = function(io, cookieParser, sessionStore) {
 
         // event for user clicking the ready button
         socket.on('player_ready', function(data) {
-            db_room.player_ready(data['name'], data['room'], function(both_ready, player1, player2) {
-                socket.emit('waiting_on_other_player', {});
 
-                console.log("\nEDGE_MAP:\n");
-                console.log(data["edge_map"]);
+            // these are just here for debugging...
+            console.log("\nEDGE_MAP:\n");
+            console.log(data["edge_map"]);
 
-                console.log("TRUE CONNECTIONS:\n");
-                console.log(data["true_connections"]);
+            console.log("TRUE CONNECTIONS:\n");
+            console.log(data["true_connections"]);
 
-                console.log("START: " + data["start"]);
-                console.log("END: " + data["end"])
+            console.log("START: " + data["start"]);
+            console.log("END: " + data["end"]);
 
-                // if we have both players ready, we start the 'play' phase
-                if(both_ready) {
-                    // 2 is the game phase
-                    db_room.switch_game_phase(data["room"], 2);
+            // validate maze, save maze in db
+            validate_maze(data["true_connections"], data["start"], data["end"], function(valid_maze) {
 
-                    get_user_by_name(player1, function(player) {
-                        player.socket.emit('start_play_phase', {});
+                if(valid_maze) {
+                    console.log(data["name"] + " submitted a valid maze!");
+                    socket.emit("maze_validation", {valid_maze: true});
+                    socket.emit('waiting_on_other_player', {});
+
+                    var maze = { 
+                        maze: data["true_connections"], 
+                        start: data["start"], 
+                        end: data["end"] 
+                    };
+
+                    db_room.player_ready(data['name'], data['room'], maze, function(both_ready, player1, player2) {
+
+                        // if we have both players ready, we start the 'play' phase
+                        if(both_ready) {
+                            // 2 is the game phase
+                            db_room.switch_game_phase(data["room"], 2);
+
+                            get_user_by_name(player1, function(player) {
+                                player.socket.emit('start_play_phase', {});
+                            });
+
+                            get_user_by_name(player2, function(player) {
+                                player.socket.emit('start_play_phase', {});
+                            });
+
+                        }
                     });
-
-                    get_user_by_name(player2, function(player) {
-                        player.socket.emit('start_play_phase', {});
-                    });
-
-
+                } else {
+                    console.log(data["name"] + " submitted an invalid maze!");
+                    socket.emit("maze_validation", {valid_maze: false});
                 }
-
-
             });
+
+            
         });
 
     }
@@ -215,5 +234,51 @@ exports.start = function(io, cookieParser, sessionStore) {
         });
     }
 }
+
+// server-side maze validation code
+// maze will be an array of connected squares e.g. [{a: 0, b: 1 }, {...}, ...]
+// uses breadth first search
+function validate_maze(maze, start, end, cb) {
+
+    var queue   = [start];
+    var visited = [];
+    var next;
+
+    while(true) {
+
+        // if the queue is empty, and we still haven't found one, we are done.
+        if(queue.length == 0) {
+            return cb(false);
+        }
+
+        // get the first elem of array
+        next = queue.shift();
+        if( next === end ) {
+            return cb(true);
+        }
+
+        visited.push(next);
+
+        add_possible_moves(next);
+    }
+
+
+
+    // searches the maze array for num, and adds it's pair to the queue
+    // only if it is not in the visited array
+    function add_possible_moves(num) {
+        for(var i = 0; i < maze.length; i++) {
+            if(maze[i].a == num && visited.indexOf(maze[i].b) == -1) {
+                queue.push(maze[i].b);
+            } else if (maze[i].b == num && visited.indexOf(maze[i].a) == -1) {
+                queue.push(maze[i].a);
+            }
+        }
+    }
+
+}
+
+
+
 
 
