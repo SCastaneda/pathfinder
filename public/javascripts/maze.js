@@ -1,7 +1,12 @@
 var maze;
 var start = true, end = true;
 
+// edge map will hold all the connections, regardless if connected or not
 var edge_map = [];
+
+// connections will hold the map of the true connections between the squares
+// this will be sent to the server for validation purposes
+var connections = [];
 
 // generates the visual board in html
 function generate_board(dim) {
@@ -240,6 +245,14 @@ function Maze(dim) {
         }
     }
 
+    this.getStartId = function() {
+        return start.getId();
+    }
+
+    this.getEndId = function() {
+        return end.getId();
+    }
+
     this.getSquares = function() {
         return squares;
     }
@@ -267,13 +280,17 @@ function Maze(dim) {
     this.removeEdge = function(a, b) {
         squares[a].removeNeighbor(squares[b]);
         squares[b].removeNeighbor(squares[a]);
-        remove_edge_from_map(a, b);
+        console.log("Removing Edge from map: a: " + a + "b: " + b );
+        remove_edge_from_connections(a, b);
+        console.log(connections);
     }
 
     this.addEdge = function(a, b) {
         squares[a].addNeighbor(squares[b]);
         squares[b].addNeighbor(squares[a]);
-        add_edge_to_map(a, b);
+        console.log("Adding Edge to map: a: " + a + "b: " + b );
+        add_edge_to_connections(a, b);
+        console.log(connections);
     }
 
     this.verify = function() {
@@ -308,28 +325,27 @@ function Maze(dim) {
     }
 }
 
-function remove_edge_from_map(a,b) {
-    var n = edge_map.length;
+function remove_edge_from_connections(a,b) {
+    var n = connections.length;
     
     for(var i = 0; i < n; i++){
-        if(edge_map[i].a == a && edge_map[i].b == b) {
-            edge_map.splice(i, 1);
+        if(connections[i].a == a && connections[i].b == b) {
+            connections.splice(i, 1);
             return;
-        } else if(edge_map[i].a == b && edge_map[i].b == a) {
-            edge_map.splice(i, 1);
+        } else if(connections[i].a == b && connections[i].b == a) {
+            connections.splice(i, 1);
             return;
         } 
     }
     console.log("Trying to remove invalid edge");
 }
 
-function add_edge_to_map(a,b) {
+function add_edge_to_connections(a,b) {
     if(a<b) {
-        edge_map.push({ a:a, b:b });
+        connections.push({ a:a, b:b });
     } else {
-        edge_map.push({ a:b, b:a });
+        connections.push({ a:b, b:a });
     }
-    console.log(edge_map);
 } 
 
 function make_edge_Map(dim) {
@@ -351,4 +367,6 @@ function make_edge_Map(dim) {
             }
         }
     }
+
+    connections = edge_map.slice(0);
 }

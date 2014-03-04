@@ -38,10 +38,14 @@ exports.start = function(io, cookieParser, sessionStore) {
             db_room.player_ready(data['name'], data['room'], function(both_ready, player1, player2) {
                 socket.emit('waiting_on_other_player', {});
 
-                console.log("MAZE:\n");
-                console.log(data["maze"]);
                 console.log("\nEDGE_MAP:\n");
                 console.log(data["edge_map"]);
+
+                console.log("TRUE CONNECTIONS:\n");
+                console.log(data["true_connections"]);
+
+                console.log("START: " + data["start"]);
+                console.log("END: " + data["end"])
 
                 // if we have both players ready, we start the 'play' phase
                 if(both_ready) {

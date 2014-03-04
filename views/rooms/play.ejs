@@ -32,7 +32,15 @@
     $('#ready_btn').on('click', function() {
         // validate maze on server side
         // if it has been validated, we can emit 'player_ready'
-        socket.emit('player_ready', {name: "<%= name %>", room: "<%= room %>", maze: maze, edge_map: edge_map });
+        socket.emit('player_ready', 
+            {   name: "<%= name %>", 
+                room: "<%= room %>", 
+                edge_map: edge_map, 
+                true_connections: connections,
+                start: maze.getStartId(),
+                end: maze.getEndId()  
+            }
+        );
     });
 
     socket.on('waiting_on_other_player', function() {
