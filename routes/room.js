@@ -5,7 +5,6 @@
 */
 var db_room = require("../db/rooms");
 
-
 exports.waiting = function(req, res){
 
     if(req.session.name) {
@@ -15,6 +14,27 @@ exports.waiting = function(req, res){
         res.redirect('/');
     }
 
+};
+
+exports.newuser = function(req, res){
+
+	res.render('newuser', {errorMessage: ''});
+};
+exports.emailpassword = function(req, res){
+
+	res.render('emailpassword', {errorMessage: ''});
+};
+exports.newuserError = function(req, res){
+
+	res.render('newuser', {errorMessage: 'All fields required'});
+};
+exports.newuserError2 = function(req, res){
+
+	res.render('newuser', {errorMessage: 'Username already exists'});
+};
+exports.emailpasswordError = function(req, res){
+
+	res.render('emailpassword', {errorMessage: 'Username does not exists'});
 };
 
 exports.play = function(req, res) {

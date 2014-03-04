@@ -1,8 +1,22 @@
+<html>
+<head>
+</head>
+<body>
 
 <h1><%= title %></h1>
-<p>Welcome to <%= title %></p>
+<h3>Welcome to <%= title %></h3>
+<h3 style="color:red"><%= errorMessage %></h3>
 
 <form action="/ready" method="post">
-    <input type="text" name="name">
-    <input type="submit" value="I'm Ready!"/>
+
+    username: <input type="text" name="name" size="15"><br>
+    password: <input type="password" name="password" size="15"><br>
+    <input type="submit" value="login"><br>
+    
+    <a href="/emailpassword"> Forgot password</a><br>
+    <a href="/newuser"> Create new account</a><br>
+
 </form>
+
+</body>
+</html>
