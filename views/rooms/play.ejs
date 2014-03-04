@@ -54,6 +54,31 @@
     });
 
 
+    /* START: new functions for turn-by-turn gameplay */
+    // to submit a move to the server:
+    // socket.emit('move_submit', {room: "<%= room %>", from: 1, to: 6 });
+
+    // this comes back after a move was submitted:
+    socket.on('move_response', function(data) { console.log(data); });
+
+    // this comes back when it's the other player's turn
+    socket.on('other_players_turn', function(data) {
+        console.log("it's the other player's turn");
+    });
+
+    // this comes back when it's your turn
+    socket.on('your_turn', function(data) {
+        //there's no data
+        console.log("It's your turn!");
+    });    
+
+    // comes back when a player wins, get's checked after every move
+    socket.on('game_over', function(data) { console.log(data); });
+
+    // server side maze-validation response
+    socket.on('maze_validation', function(data) { console.log(data); });
+    /* END: new functions for turn-by-turn gameplay */
+
     function go_home(data) {
         window.location.replace("/");
     }

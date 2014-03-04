@@ -26,66 +26,134 @@ exports.start = function(io, cookieParser, sessionStore) {
             socket.emit('disconnect', {});
         }
 
-        socket.on('disconnect', function() {
-            disconnect(socket);
-        });
-        socket.on('join_room', function(data) {
-            join_room(data['room'], session, socket, user);
-        });
+        socket.on('disconnect', function() { disconnect(socket); });
+        socket.on('join_room', function(data) { join_room(data['room'], session, socket, user); });
 
         // event for user clicking the ready button
-        socket.on('player_ready', function(data) {
+        // validates the maze, and if both players are ready, puts them into the play_phase
+        socket.on('player_ready', function(data) { player_ready(data, socket); });
 
-            // these are just here for debugging...
-            console.log("\nEDGE_MAP:\n");
-            console.log(data["edge_map"]);
+        // handles the request to move.
+        socket.on('move_submit', function(data) { handle_move(data, socket, session); });
 
-            console.log("TRUE CONNECTIONS:\n");
-            console.log(data["true_connections"]);
+    }
 
-            console.log("START: " + data["start"]);
-            console.log("END: " + data["end"]);
+    function handle_move(data, socket, session) {
+        db_room.handle_move_request(
+            data['room'], session.name, data['from'], data['to'], 
+            function(status, message) {
 
-            // validate maze, save maze in db
-            validate_maze(data["true_connections"], data["start"], data["end"], function(valid_maze) {
-
-                if(valid_maze) {
-                    console.log(data["name"] + " submitted a valid maze!");
-                    socket.emit("maze_validation", {valid_maze: true});
-                    socket.emit('waiting_on_other_player', {});
-
-                    var maze = { 
-                        maze: data["true_connections"], 
-                        start: data["start"], 
-                        end: data["end"] 
-                    };
-
-                    db_room.player_ready(data['name'], data['room'], maze, function(both_ready, player1, player2) {
-
-                        // if we have both players ready, we start the 'play' phase
-                        if(both_ready) {
-                            // 2 is the game phase
-                            db_room.switch_game_phase(data["room"], 2);
-
-                            get_user_by_name(player1, function(player) {
-                                player.socket.emit('start_play_phase', {});
-                            });
-
-                            get_user_by_name(player2, function(player) {
-                                player.socket.emit('start_play_phase', {});
-                            });
-
-                        }
-                    });
+                // all good, no errors, and no wall
+                if(status == true) {
+                    socket.emit('move_response', {error: false, move: true, wall: false, message: "Valid move!"});
+                // no error, but there was a wall
+                } else if(status == false && message === 'wall') {
+                    socket.emit('move_response', {error: false, move: false, wall: true, message: "Hit a wall!"});
+                // everything else is an error of some sorts, that's passed to the front    
                 } else {
-                    console.log(data["name"] + " submitted an invalid maze!");
-                    socket.emit("maze_validation", {valid_maze: false});
+                    socket.emit('move_response', {error: true, move: false, wall: false, message: message});
                 }
-            });
 
-            
+                // check for a winner, every time a move is made.
+                db_room.check_for_win(data['room'], function(game_over, winner, loser) {
+                    
+                    // if the game is over, let both players know
+                    if(game_over) {
+                        get_user_by_name(winner, function(player) {
+                            player.socket.emit('game_over', { winner: winner, loser: loser });
+                        });
+                        get_user_by_name(loser, function(player) {
+                            player.socket.emit('game_over', { winner: winner, loser: loser });
+                        });
+
+                    // if the game is not over, let the next player know it's his turn
+                    // and the last player, that he's waiting on the other player
+                    } else {
+
+                        // tell current player that it's other player's turn
+                        socket.emit("other_players_turn", {});
+
+                        // tell next player that it's his turn
+                        db_room.get_next_player(data['room'], function(next_player) {
+
+                            get_user_by_name(next_player, function(player) {
+                                player.socket.emit('your_turn', {});
+                            });
+
+                        });
+                    }
+                });
+            }
+        );
+    }
+
+    function player_ready(data, socket) {
+
+        // these are just here for debugging...
+        console.log("TRUE CONNECTIONS:\n");
+        console.log(data["true_connections"]);
+
+        console.log("START: " + data["start"]);
+        console.log("END: " + data["end"]);
+
+        // validate maze, save maze in db
+        validate_maze(data["true_connections"], data["start"], data["end"], function(valid_maze) {
+
+            if(valid_maze) {
+                console.log(data["name"] + " submitted a valid maze!");
+                socket.emit("maze_validation", {valid_maze: true});
+                socket.emit('waiting_on_other_player', {});
+
+                var board = { 
+                    maze: data["true_connections"], 
+                    current_position: data["start"], 
+                    end: data["end"] 
+                };
+
+                db_room.player_ready(data['name'], data['room'], board, function(both_ready, player1, player2) {
+
+                    // if we have both players ready, we start the 'play' phase
+                    if(both_ready) {
+                        // 1 is the game phase
+                        db_room.switch_game_phase(data["room"], 1);
+
+                        get_user_by_name(player1, function(player) {
+
+                            player.socket.emit('start_play_phase', {});
+
+                            // tell this player who's turn it is
+                            db_room.get_next_player(data['room'], function(next_player) {
+                                if(next_player === player.name) {
+                                    player.socket.emit('your_turn', {});
+                                } else {
+                                    player.socket.emit('other_players_turn', {});
+                                }
+                            });
+                        });
+
+                        get_user_by_name(player2, function(player) {
+
+                            player.socket.emit('start_play_phase', {});
+
+                            // tell this user who's turn it is
+                            db_room.get_next_player(data['room'], function(next_player) {
+                                if(next_player === player.name) {
+                                    player.socket.emit('your_turn', {});
+                                } else {
+                                    player.socket.emit('other_players_turn', {});
+                                }
+                            });
+                        });
+
+                    }
+                });
+            } else {
+                console.log(data["name"] + " submitted an invalid maze!");
+                socket.emit("maze_validation", {valid_maze: false});
+            }
         });
 
+        
     }
 
     // checks the waiting room to see if 2 or more user are there, and dispatches them to a game.
