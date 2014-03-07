@@ -2,7 +2,17 @@
 
 <div id='announcements'>Waiting on other player to join</div>
 
-<div id="board"></div>
+<table>
+    <tr>
+        <td><div id="board"></div></td>
+        <td><div id="opp_board"></div></td>
+    </tr>
+    <tr>
+        <td><textarea id="chat" style="resize:none" cols="40" rows="5" readonly disabled></textarea></td>
+        <td><textarea id="log" style="resize:none" cols="20" rows="5" readonly disabled></textarea></td>
+    </tr>
+</table>
+
 <button id="ready_btn">I'm Ready!</button>
 
 
@@ -20,11 +30,17 @@
 <script src='/javascripts/maze.js'></script>
 <script src="/socket.io/socket.io.js"></script>
 <script type="text/javascript">
+    var dim;
     var socket = io.connect("");
     socket.emit('join_room', {room: '<%= room %>'});
 
     socket.on('disconnect', go_home);
     socket.on('start_create_maze_phase', function(data) {
+
+        // assigning this variable to access later when we create the new board element
+        // this may not be needed
+        dim = data['maze_dim'];
+
         generate_board(data['maze_dim']);
         $('#announcements').html("Build your maze, and click 'I'm ready', when you're done!");
     });
@@ -51,6 +67,15 @@
 
     socket.on('start_play_phase', function(data) {
         $('#announcements').html("Play phase started!");
+
+        disable_board_modify = true;
+
+        // Creates a new board element, this will be what the user uses 
+        // to see their progress and make their next move
+        create_board_html("#opp_board", dim, true);
+
+        $('#ready_btn').remove();
+        
     });
 
 

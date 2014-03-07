@@ -1,5 +1,5 @@
 var maze;
-var start = true, end = true;
+var start = true, end = true, disable_board_modify = false;
 
 // edge map will hold all the connections, regardless if connected or not
 var edge_map = [];
@@ -8,13 +8,18 @@ var edge_map = [];
 // this will be sent to the server for validation purposes
 var connections = [];
 
-// generates the visual board in html
+// generates the visual board in html and the maze in memory for the build phase
 function generate_board(dim) {
     // create the maze in memory
     maze = new Maze(dim);
     make_edge_Map(dim);
 
-    $("#board").empty();
+    create_board_html("#board", dim, false);
+}
+
+// generates the html for a board
+function create_board_html(divID, dim, emptyBoard) {
+    $(divID).empty();
     var current_wall = 0;
     var current_square = 0;
 
@@ -50,7 +55,7 @@ function generate_board(dim) {
                 var square = $("<div>", {class: "square", id: "s"+current_square}).click(toggle)
                 $(wall_square).append($("<div>", {class: "wall wall-vertical red"}), square);
 
-            } else if (j === dim - 1 && i === dim - 1) {
+            } else if (j === dim - 1 && i === dim - 1 && !emptyBoard) {
                 // The very last square defaults to exit
                 var wall = $("<div>", {class: "wall wall-vertical", id: current_wall}).click(toggle);
                 var square = $("<div>", {class: "square end", id: "s"+current_square}).click(toggle)
@@ -70,7 +75,7 @@ function generate_board(dim) {
         $(wall_square).append($("<div>", {class: "wall wall-vertical red"}));
 
         // add the two rows to the board
-        $("#board").append(wall_row, wall_square)
+        $(divID).append(wall_row, wall_square)
     }
 
     // final row of spacers and walls here, identical to the very first row
@@ -79,7 +84,7 @@ function generate_board(dim) {
         $(final_row).append($("<div>", {class: "spacer"}), $("<div>", {class: "wall wall-horizontal red"}));
     }
     $(final_row).append($("<div>", {class: "spacer"}));
-    $("#board").append(final_row);
+    $(divID).append(final_row);
 }
 
 // This function will handle all the clicks on the HTML elements
@@ -90,6 +95,14 @@ function toggle(event) {
     if ($(target).hasClass("square")) {
 
         var index = parseInt(id.slice(1));
+
+        if ($(target).parents("#opp-board").length == 1) {
+
+        }
+
+        if (disable_board_modify) {
+            return;
+        }
 
         if ($(target).hasClass("start")) {
             $(target).removeClass("start");
@@ -120,6 +133,10 @@ function toggle(event) {
         }
     } else {
         var index = parseInt(id);
+
+        if ($(target).parents("#opp-board").length == 1 || disable_board_modify) {
+            return;
+        }
 
         if ($(target).hasClass("red")) {
             $(target).removeClass("red");
