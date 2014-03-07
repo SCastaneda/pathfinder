@@ -1,6 +1,6 @@
 var maze;
 var start = true, end = true, disable_board_modify = false, current_turn = false;
-var fromSquare = null, toSquare = null;
+var from_square = null, to_square = null;
 
 // edge map will hold all the connections, regardless if connected or not
 var edge_map = [];
@@ -24,6 +24,7 @@ function create_board_html(divID, dim, emptyBoard) {
     var current_wall = 0;
     var current_square = 0;
     var id_prefix = (emptyBoard)? "o": "s";
+    var wall_id_prefix = (emptyBoard)? "w": "";
 
     for(var i = 0; i < dim; i++) {
         // This is the div to hold the row of spacers and walls
@@ -35,7 +36,7 @@ function create_board_html(divID, dim, emptyBoard) {
                 $(wall_row).append($("<div>", {class: "spacer"}), $("<div>", {class: "wall wall-horizontal red"}));
             } else {
                 // otherwise the walls are grey, are assigned an ID, and get the function attached if they are clicked
-                var wall = $("<div>", {class: "wall wall-horizontal", id: current_wall}).click(toggle);
+                var wall = $("<div>", {class: "wall wall-horizontal", id: wall_id_prefix+current_wall}).click(toggle);
                 $(wall_row).append($("<div>", {class: "spacer"}), wall);
                 current_wall++;
             }
@@ -57,7 +58,7 @@ function create_board_html(divID, dim, emptyBoard) {
                 $(wall_square).append($("<div>", {class: "wall wall-vertical red"}), square);
 
             } else if (emptyBoard) {
-                var wall = $("<div>", {class: "wall wall-vertical", id: current_wall}).click(toggle);
+                var wall = $("<div>", {class: "wall wall-vertical", id: wall_id_prefix+current_wall}).click(toggle);
                 var square = $("<div>", {class: "square hidden", id: id_prefix+current_square}).click(toggle)
                 $(wall_square).append(wall, square);
                 current_wall++;
@@ -68,14 +69,14 @@ function create_board_html(divID, dim, emptyBoard) {
 
             } else if (j === dim - 1 && i === dim - 1 && !emptyBoard) {
                 // The very last square defaults to exit
-                var wall = $("<div>", {class: "wall wall-vertical", id: current_wall}).click(toggle);
+                var wall = $("<div>", {class: "wall wall-vertical", id: wall_id_prefix+current_wall}).click(toggle);
                 var square = $("<div>", {class: "square end", id: id_prefix+current_square}).click(toggle)
                 $(wall_square).append(wall, square);
                 current_wall++;
 
             } else {
                 // Otherwise walls need to be grey, assigned an ID, and get the fucntion attached if they are clicked
-                var wall = $("<div>", {class: "wall wall-vertical", id: current_wall}).click(toggle);
+                var wall = $("<div>", {class: "wall wall-vertical", id: wall_id_prefix+current_wall}).click(toggle);
                 var square = $("<div>", {class: "square", id: id_prefix+current_square}).click(toggle)
                 $(wall_square).append(wall, square);
                 current_wall++;
@@ -108,16 +109,15 @@ function toggle(event) {
         var index = parseInt(id.slice(1));
 
         if ($(target).parents("#opp_board").length == 1) {
-            console.log("jhhjjlafdfdjakfda");
             // if the clicked square is the the board we select our next moves on
             if ($(target).hasClass("current")) {
                 return;
             } else {
                 // if there's already one selected, remove it first
-                if (toSquare !== null) {
-                    $("#o"+toSquare).removeClass("selected");
+                if (to_square !== null) {
+                    $("#o"+to_square).removeClass("selected");
                 }
-                toSquare = index;
+                to_square = index;
                 $(target).addClass("selected");
             }
         }
@@ -409,4 +409,45 @@ function make_edge_Map(dim) {
     }
 
     connections = edge_map.slice(0);
+}
+
+function valid_move(from, to, dim) {
+    if (from === null || to === null) {
+        return false;
+    } else if (Math.abs(from-to) === dim || Math.abs(from-to) === 1) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function get_wall_id(from, to, dim) {
+    var walls_per_row = (2*dim) - 1;
+    var from_row = parseInt(from/dim);
+    var from_col = from % dim;
+    var wall;
+
+    if (Math.abs(from-to) === 1) {
+        // The wall was to the right or left of the current square
+    
+        if (from - to > 0) {
+            // Wall is to the left of "from"
+            var to_col = from_col - 1;
+            wall = (from_row * walls_per_row) + to_col;
+
+        } else {
+            // Wall is to the right of "from"
+            wall = (from_row * walls_per_row) + from_col;
+        }
+    } else {
+        if (from - to > 0) {
+            // Wall is above "from"
+            var to_row = from_row - 1;
+            wall = (to_row * walls_per_row) + (dim - 1) + from_col;
+        } else {
+            // Wall is below "from"
+            wall = (from_row * walls_per_row) + (dim - 1) + from_col;
+        }
+    }
+    return wall;
 }

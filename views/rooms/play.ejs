@@ -30,7 +30,7 @@
 <script src='/javascripts/maze.js'></script>
 <script src="/socket.io/socket.io.js"></script>
 <script type="text/javascript">
-    var dim;
+    var dim, start;
     var socket = io.connect("");
     socket.emit('join_room', {room: '<%= room %>'});
 
@@ -70,24 +70,69 @@
 
         disable_board_modify = true;
 
+        //
+        // ***FIX ME***
+        // 
+        from_square = 0;
+        start = 0;
+        $("#o"+from_square).removeClass("start").addClass("current");
+
         // Creates a new board element, this will be what the user uses 
         // to see their progress and make their next move
         create_board_html("#opp_board", dim, true);
 
         $('#ready_btn').remove();
-        $('#board_row').append($("<button>", {id: "submit", text:"Submit"}).click(function() {
-            
-        })).wrap("<td></td>");
-        
+        $('#board_row').append($("<button>", {id: "submit", text:"Submit"}).wrap("<td></td>").click(function() {
+            // check if it could be a valid move. This does not check if the player has already
+            // found a wall here.
+            if (valid_move(from_square, to_square, dim)) {
+                // if valid, submit
+                socket.emit('move_submit', {room: "<%= room %>", from: from_square, to: to_square});
+                console.log("Move submitted");
+            } else {
+                console.log("Not a valid move");
+            }
+        }));
     });
 
 
     /* START: new functions for turn-by-turn gameplay */
     // to submit a move to the server:
-    // socket.emit('move_submit', {room: "<%= room %>", from: 1, to: 6 });
+    
 
     // this comes back after a move was submitted:
-    socket.on('move_response', function(data) { console.log(data); });
+    socket.on('move_response', function(data) { 
+
+        // if the move was validated by the server
+        if (data['move']) {
+            // Update the html
+            $("#o"+from_square).removeClass("current");
+            $("#o"+to_square).removeClass("selected");
+            $("#o"+to_square).addClass("current");
+
+            // if from_square was the start square
+            if (from_square === start) {
+                $("#o"+from_square).addClass("start");
+            }
+
+            // from because the old to, the new to_square doesn't exist yet
+            from_square = to_square;
+            to_square = null;
+        } else {
+            // Move blocked by wall
+
+            // get the id of the blocking wall and show a wall there
+            var id = get_wall_id(from_square, to_square, dim);
+            console.log("wall id:"+id);
+            $("#w"+id).addClass("red");
+
+            // reset selected square;
+            $("#o"+to_square).removeClass("selected");
+            to_square = null;
+        }
+
+        console.log(data); 
+    });
 
     // this comes back when it's the other player's turn
     socket.on('other_players_turn', function(data) {
