@@ -52,6 +52,8 @@ exports.start = function(io, cookieParser, sessionStore) {
                 // everything else is an error of some sorts, that's passed to the front    
                 } else {
                     socket.emit('move_response', {error: true, move: false, wall: false, message: message});
+                    // stop here if there was an error, to give the player another chance to play
+                    return;
                 }
 
                 // check for a winner, every time a move is made.
@@ -77,7 +79,15 @@ exports.start = function(io, cookieParser, sessionStore) {
                         db_room.get_next_player(data['room'], function(next_player) {
 
                             get_user_by_name(next_player, function(player) {
-                                player.socket.emit('your_turn', {});
+
+                                if(status == true) {
+                                    player.socket.emit('your_turn', {move: true, wall: false, from: data['from'], to: data['to']});
+                                // no error, but there was a wall
+                                } else if(status == false && message === 'wall') {
+                                    player.socket.emit('your_turn', {move: false, wall: true, from: data['from'], to: data['to']});
+                                }
+
+                                // player.socket.emit('your_turn', {});
                             });
 
                         });
