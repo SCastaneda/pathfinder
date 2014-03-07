@@ -120,7 +120,7 @@ exports.start = function(io, cookieParser, sessionStore) {
                     end: data["end"] 
                 };
 
-                db_room.player_ready(data['name'], data['room'], board, function(both_ready, player1, player2) {
+                db_room.player_ready(data['name'], data['room'], board, function(both_ready, player1, player2, start1, start2) {
 
                     // if we have both players ready, we start the 'play' phase
                     if(both_ready) {
@@ -129,7 +129,7 @@ exports.start = function(io, cookieParser, sessionStore) {
 
                         get_user_by_name(player1, function(player) {
 
-                            player.socket.emit('start_play_phase', {});
+                            player.socket.emit('start_play_phase', {start: start2});
 
                             // tell this player who's turn it is
                             db_room.get_next_player(data['room'], function(next_player) {
@@ -143,7 +143,7 @@ exports.start = function(io, cookieParser, sessionStore) {
 
                         get_user_by_name(player2, function(player) {
 
-                            player.socket.emit('start_play_phase', {});
+                            player.socket.emit('start_play_phase', {start: start1});
 
                             // tell this user who's turn it is
                             db_room.get_next_player(data['room'], function(next_player) {
