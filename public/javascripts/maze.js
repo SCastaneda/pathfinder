@@ -50,6 +50,15 @@ function create_board_html(divID, dim, emptyBoard) {
                 var square = $("<div>", {class: "square start", id: "s"+current_square}).click(toggle);
                 $(wall_square).append($("<div>", {class: "wall wall-vertical red"}), square);                   
 
+            } else if (j === 0 && emptyBoard) {
+                var square = $("<div>", {class: "square hidden", id: "s"+current_square}).click(toggle);
+                $(wall_square).append($("<div>", {class: "wall wall-vertical red"}), square);
+
+            } else if (emptyBoard) {
+                var wall = $("<div>", {class: "wall wall-vertical", id: current_wall}).click(toggle);
+                var square = $("<div>", {class: "square hidden", id: "s"+current_square}).click(toggle)
+                $(wall_square).append(wall, square);
+                current_wall++;
             } else if (j === 0) {
                 // Otherwise just make sure the far left wall is red
                 var square = $("<div>", {class: "square", id: "s"+current_square}).click(toggle)

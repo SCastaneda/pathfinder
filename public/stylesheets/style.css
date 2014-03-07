@@ -49,6 +49,10 @@ a {
     background-color: #e74c3c;
 }
 
+.hidden {
+    background-color: Gray;
+}
+
 .start {
     background-color: Green;
 }
