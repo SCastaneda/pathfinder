@@ -3,11 +3,11 @@
 <div id='announcements'>Waiting on other player to join</div>
 
 <table>
-    <tr>
+    <tr id="board_row">
         <td><div id="board"></div></td>
         <td><div id="opp_board"></div></td>
     </tr>
-    <tr>
+    <tr id="info_row">
         <td><textarea id="chat" style="resize:none" cols="40" rows="5" readonly disabled></textarea></td>
         <td><textarea id="log" style="resize:none" cols="20" rows="5" readonly disabled></textarea></td>
     </tr>
@@ -75,6 +75,9 @@
         create_board_html("#opp_board", dim, true);
 
         $('#ready_btn').remove();
+        $('#board_row').append($("<button>", {id: "submit", text:"Submit"}).click(function() {
+            console.log("OMG SUBMIT WAS CLICKED");
+        })).wrap("<td></td>");
         
     });
 
@@ -89,12 +92,16 @@
     // this comes back when it's the other player's turn
     socket.on('other_players_turn', function(data) {
         console.log("it's the other player's turn");
+
+        current_turn = false;
     });
 
     // this comes back when it's your turn
     socket.on('your_turn', function(data) {
         //there's no data
         console.log("It's your turn!");
+
+        current_turn = true;
     });    
 
     // comes back when a player wins, get's checked after every move
