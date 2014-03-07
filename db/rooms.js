@@ -107,8 +107,11 @@ exports.player_ready = function(player, hash, board, cb) {
                     }
 
                     // if both players are ready, we return true and both players
+                    // + starting position of boards
                     if(room.player2_ready) {
-                        return cb(true, room.player1, room.player2);
+                        roomModel.findOne({hash: hash}, function(err, room) {
+                            return cb(true, room.player1, room.player2, room.player1_board.current_position, room.player2_board.current_position);
+                        });
                     } else {
                         return cb(false);
                     }
@@ -129,8 +132,11 @@ exports.player_ready = function(player, hash, board, cb) {
                     }
 
                     // if both players are ready, we return true and both players
+                    // + starting position of boards
                     if(room.player1_ready) {
-                        return cb(true, room.player1, room.player2);
+                        roomModel.findOne({hash: hash}, function(err, room) {
+                            return cb(true, room.player1, room.player2, room.player1_board.current_position, room.player2_board.current_position);
+                        });
                     } else {
                         return cb(false);
                     }
