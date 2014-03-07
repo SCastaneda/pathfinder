@@ -53,6 +53,14 @@ a {
     background-color: Gray;
 }
 
+.selected {
+    background-color: Black;
+}
+
+.current {
+    background-color: White;
+}
+
 .start {
     background-color: Green;
 }
