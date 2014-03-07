@@ -1,5 +1,6 @@
 var maze;
 var start = true, end = true, disable_board_modify = false, current_turn = false;
+var fromSquare = null, toSquare = null;
 
 // edge map will hold all the connections, regardless if connected or not
 var edge_map = [];
@@ -22,6 +23,7 @@ function create_board_html(divID, dim, emptyBoard) {
     $(divID).empty();
     var current_wall = 0;
     var current_square = 0;
+    var id_prefix = (emptyBoard)? "o": "s";
 
     for(var i = 0; i < dim; i++) {
         // This is the div to hold the row of spacers and walls
@@ -47,34 +49,34 @@ function create_board_html(divID, dim, emptyBoard) {
         for (var j = 0; j < dim; j++) {
             if (j === 0 && i === 0) {
                 // The very first square defaults to start
-                var square = $("<div>", {class: "square start", id: "s"+current_square}).click(toggle);
+                var square = $("<div>", {class: "square start", id: id_prefix+current_square}).click(toggle);
                 $(wall_square).append($("<div>", {class: "wall wall-vertical red"}), square);                   
 
             } else if (j === 0 && emptyBoard) {
-                var square = $("<div>", {class: "square hidden", id: "s"+current_square}).click(toggle);
+                var square = $("<div>", {class: "square hidden", id: id_prefix+current_square}).click(toggle);
                 $(wall_square).append($("<div>", {class: "wall wall-vertical red"}), square);
 
             } else if (emptyBoard) {
                 var wall = $("<div>", {class: "wall wall-vertical", id: current_wall}).click(toggle);
-                var square = $("<div>", {class: "square hidden", id: "s"+current_square}).click(toggle)
+                var square = $("<div>", {class: "square hidden", id: id_prefix+current_square}).click(toggle)
                 $(wall_square).append(wall, square);
                 current_wall++;
             } else if (j === 0) {
                 // Otherwise just make sure the far left wall is red
-                var square = $("<div>", {class: "square", id: "s"+current_square}).click(toggle)
+                var square = $("<div>", {class: "square", id: id_prefix+current_square}).click(toggle)
                 $(wall_square).append($("<div>", {class: "wall wall-vertical red"}), square);
 
             } else if (j === dim - 1 && i === dim - 1 && !emptyBoard) {
                 // The very last square defaults to exit
                 var wall = $("<div>", {class: "wall wall-vertical", id: current_wall}).click(toggle);
-                var square = $("<div>", {class: "square end", id: "s"+current_square}).click(toggle)
+                var square = $("<div>", {class: "square end", id: id_prefix+current_square}).click(toggle)
                 $(wall_square).append(wall, square);
                 current_wall++;
 
             } else {
                 // Otherwise walls need to be grey, assigned an ID, and get the fucntion attached if they are clicked
                 var wall = $("<div>", {class: "wall wall-vertical", id: current_wall}).click(toggle);
-                var square = $("<div>", {class: "square", id: "s"+current_square}).click(toggle)
+                var square = $("<div>", {class: "square", id: id_prefix+current_square}).click(toggle)
                 $(wall_square).append(wall, square);
                 current_wall++;
             }
@@ -105,8 +107,19 @@ function toggle(event) {
 
         var index = parseInt(id.slice(1));
 
-        if ($(target).parents("#opp-board").length == 1) {
-
+        if ($(target).parents("#opp_board").length == 1) {
+            console.log("jhhjjlafdfdjakfda");
+            // if the clicked square is the the board we select our next moves on
+            if ($(target).hasClass("current")) {
+                return;
+            } else {
+                // if there's already one selected, remove it first
+                if (toSquare !== null) {
+                    $("#o"+toSquare).removeClass("selected");
+                }
+                toSquare = index;
+                $(target).addClass("selected");
+            }
         }
 
         if (disable_board_modify) {
@@ -114,10 +127,10 @@ function toggle(event) {
         }
 
         if ($(target).hasClass("start")) {
-            $(target).removeClass("start");
-            start = false;
+            // $(target).removeClass("start");
+            // start = false;
 
-            maze.removeStart();
+            // maze.removeStart();
 
         } else if ($(target).hasClass("end")) {
             $(target).removeClass("end");
@@ -126,10 +139,10 @@ function toggle(event) {
             maze.removeEnd();
 
         } else if (!start) {
-            $(target).addClass("start");
-            start = true;
+            // $(target).addClass("start");
+            // start = true;
 
-            maze.addStart(index);
+            // maze.addStart(index);
 
         } else if (!end) {
             $(target).addClass("end");
@@ -138,12 +151,13 @@ function toggle(event) {
             maze.addEnd(index);
 
         } else {
+            console.log("f");
             return;
         }
     } else {
         var index = parseInt(id);
 
-        if ($(target).parents("#opp-board").length == 1 || disable_board_modify) {
+        if ($(target).parents("#opp-board").length > 0 || disable_board_modify) {
             return;
         }
 
