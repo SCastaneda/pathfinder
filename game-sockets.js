@@ -36,6 +36,19 @@ exports.start = function(io, cookieParser, sessionStore) {
         // handles the request to move.
         socket.on('move_submit', function(data) { handle_move(data, socket, session); });
 
+        // handles chat
+        socket.on('send_message', function(data) { broadcast_message(data, user); });
+
+    }
+
+    function broadcast_message(data, user) {
+        console.log(user.name + " trying to broadcast to room: " + user.room);
+        get_users_by_room(user.room, function(users) {
+            console.log("Broadcasting message '" + data['message'] + "' to: " + users);
+            for(var i = 0; i < users.length; i++) {
+                users[i].socket.emit('broadcast_message', { by: user.name, message: data['message'] });
+            }
+        });
     }
 
     function handle_move(data, socket, session) {
@@ -224,6 +237,15 @@ exports.start = function(io, cookieParser, sessionStore) {
         });
     }
 
+    function get_users_by_room(room, cb) {
+        var players = [];
+        for(var i = 0; i < all_users_playing.length; i++) {
+            if(room == all_users_playing[i].room) {
+                players.push(all_users_playing[i]);
+            }
+        }
+        return cb(players);
+    }
 
     function get_user_by_name(name, cb) {
         for(var i = 0; i < all_users_waiting.length; i++) {

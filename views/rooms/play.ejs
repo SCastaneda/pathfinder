@@ -34,6 +34,14 @@
     var socket = io.connect("");
     socket.emit('join_room', {room: '<%= room %>'});
 
+    // START: stubs for chat 
+    // to handle incoming messages:
+    socket.on('broadcast_message', function(data) { console.log(data); });
+
+    // to send messages:
+    //socket.emit('send_message', {message: "Hi"});
+    // END: stubs for chat 
+
     socket.on('disconnect', go_home);
     socket.on('start_create_maze_phase', function(data) {
 
