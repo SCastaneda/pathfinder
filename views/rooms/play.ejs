@@ -8,8 +8,8 @@
         <td><div id="opp_board"></div></td>
     </tr>
     <tr id="info_row">
-        <td><textarea id="chat" style="resize:none" cols="40" rows="5" readonly disabled></textarea></td>
-        <td><textarea id="log" style="resize:none" cols="20" rows="5" readonly disabled></textarea></td>
+        <td><textarea id="chat" style="resize:none" cols="40" rows="5" readonly></textarea></td>
+        <td><textarea id="log" style="resize:none" data-role="none" cols="40" rows="5" readonly></textarea></td>
     </tr>
 </table>
 
@@ -136,7 +136,9 @@
 
     // this comes back when it's the other player's turn
     socket.on('other_players_turn', function(data) {
-        console.log("it's the other player's turn");
+        // console.log("it's the other player's turn");
+        $("#log").append("It's the other player's turn.\n");
+        $('#log').scrollTop($('#log')[0].scrollHeight);
 
         $('#submit').attr('disabled', 'disabled');
         current_turn = false;
@@ -145,7 +147,10 @@
     // this comes back when it's your turn
     socket.on('your_turn', function(data) {
         //there's no data
-        console.log("It's your turn!");
+        // console.log("It's your turn!");
+        $("#log").append("It's your turn!\n");
+        $('#log').scrollTop($('#log')[0].scrollHeight);
+
 
         $('#submit').removeAttr('disabled');
         current_turn = true;
@@ -161,4 +166,19 @@
     function go_home(data) {
         window.location.replace("/");
     }
+
+    function log_turn(to, from, player, valid, won) {
+        if (won) {
+            $("#log").appened(player+" WINS!\n");
+            return;
+        }
+        if (valid) {
+            $("#log").append(player+" moved from: "+from+" to: "+to+"\n");
+        } else {
+            $("#log").append(player+" tried to move from: "+from+" to: "+to+", but FAILED HORRIBLY.\n");
+        }
+        
+        $('#log').scrollTop($('#log')[0].scrollHeight);
+    }
+
 </script>
