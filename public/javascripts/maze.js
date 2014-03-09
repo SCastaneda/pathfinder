@@ -1,6 +1,7 @@
 var maze;
 var start = true, end = true, disable_board_modify = false, current_turn = false;
 var from_square = null, to_square = null;
+var other_current = null;
 
 // edge map will hold all the connections, regardless if connected or not
 var edge_map = [];

@@ -101,10 +101,10 @@
     
 
     // this comes back after a move was submitted:
-    socket.on('move_response', function(data) { 
-
-        // if the move was validated by the server
+    socket.on('move_response', function(data) {
         if (data['move']) {
+            // if the move was validated by the server
+            log_turn(to_square, from_square, "You", true, false);
             // Update the html
             $("#o"+from_square).removeClass("current");
             $("#o"+to_square).removeClass("selected");
@@ -121,9 +121,11 @@
         } else {
             // Move blocked by wall
 
+            log_turn(to_square, from_square, "You", false, false);
+
             // get the id of the blocking wall and show a wall there
             var id = get_wall_id(from_square, to_square, dim);
-            console.log("wall id:"+id);
+            // console.log("wall id:"+id);
             $("#w"+id).addClass("red");
 
             // reset selected square;
@@ -131,7 +133,7 @@
             to_square = null;
         }
 
-        console.log(data); 
+        // console.log(data); 
     });
 
     // this comes back when it's the other player's turn
@@ -142,15 +144,39 @@
 
         $('#submit').attr('disabled', 'disabled');
         current_turn = false;
+
+        // initialize the other player's position if it's the first round
+        if (other_current === null) {
+            other_current = maze.getStartId();
+            $('#s'+other_current).addClass('current');
+        }
     });
 
     // this comes back when it's your turn
     socket.on('your_turn', function(data) {
-        //there's no data
-        // console.log("It's your turn!");
+
+        if (other_current !== null) {
+            // if it's not the first round
+
+            // log the other players turn
+            log_turn(data['to'], data['from'], "The other guy", data['move'], false);
+            if (data['move']) {
+                other_current = data['to'];
+
+                // update the html
+                $('#s'+data['from']).removeClass('current');
+                $('#s'+data['to']).addClass('current');
+            }
+
+        } else {
+            // if it's the first round
+            other_current = maze.getStartId();
+            $('#s'+other_current).addClass('current');
+        }
+
+        // log
         $("#log").append("It's your turn!\n");
         $('#log').scrollTop($('#log')[0].scrollHeight);
-
 
         $('#submit').removeAttr('disabled');
         current_turn = true;
