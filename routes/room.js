@@ -16,36 +16,6 @@ exports.waiting = function(req, res){
 
 };
 
-//renders newuser and forgot password pages
-exports.newuser = function(req, res){
-
-	res.render('newuser', {errorMessage: ''});
-};
-exports.emailpassword = function(req, res){
-
-	res.render('emailpassword', {errorMessage: ''});
-};
-exports.newuserError = function(req, res){
-
-	res.render('newuser', {errorMessage: 'All fields required'});
-};
-exports.newuserErrorMatchingPassword = function(req, res){
-
-	res.render('newuser', {errorMessage: 'Password fields do not match'});
-};
-exports.newuserErrorMatchingEmail = function(req, res){
-
-	res.render('newuser', {errorMessage: 'Email fields do not match'});
-};
-exports.newuserErrorUserExists = function(req, res){
-
-	res.render('newuser', {errorMessage: 'Username already exists'});
-};
-exports.emailpasswordError = function(req, res){
-
-	res.render('emailpassword', {errorMessage: 'Username does not exists'});
-};
-
 exports.play = function(req, res) {
     var hash = req.params.hash;
 

@@ -10,6 +10,7 @@ var express  = require('express');
 var partials = require('express-partials');
 
 var routes   = require('./routes');
+var routes_user = require('./routes/user');
 
 var room     = require('./routes/room');
 var game_sockets = require('./game-sockets');
@@ -49,16 +50,8 @@ app.get('/', routes.index);
 app.get('/ready', room.waiting);
 app.get('/play/:hash', room.play);
 //routes to funcitons that render the pages with different error messages
-app.get('/indexError', routes.indexError);
-app.get('/indexEmailSent', routes.indexEmailSent);
-app.get('/indexUserCreated', routes.indexUserCreated);
-app.get('/newuser', room.newuser);
-app.get('/newuserError', room.newuserError);
-app.get('/newuserErrorUserExists', room.newuserErrorUserExists);
-app.get('/newuserErrorMatchingPassword', room.newuserErrorMatchingPassword);
-app.get('/newuserErrorMatchingEmail', room.newuserErrorMatchingEmail);
-app.get('/emailpassword', room.emailpassword);
-app.get('/emailpasswordError', room.emailpasswordError);
+app.get('/emailPassword', routes_user.emailpassword);
+app.get('/newuser', routes_user.newuser)
 
 app.post('/ready', function(req, res) {
 
@@ -78,7 +71,9 @@ app.post('/ready', function(req, res) {
 		}
 		else{
 			console.log('failed login');
-			res.redirect('/indexError');
+			req.session.errorMessage = "Invalid username or password";
+			req.session.infoMessage = "";
+			res.redirect('/');
 		}
 	});
 });
@@ -103,15 +98,20 @@ app.post('/newuser', function(req, res){
 		|| (passwordVerify ==''|| email == '')) 
 		|| (emailVerify == ''))
 		{
-		res.redirect('/newuserError');
+
+		req.session.errorMessage = "All fields required";
+		res.redirect('/newuser');
 	}
 
 	//else if passwords or emails dont match redirect them with an error
 	else if(password != passwordVerify){
-		res.redirect('/newuserErrorMatchingPassword');	
+
+		req.session.errorMessage = "Password feilds do not match";
+		res.redirect('/newuser');	
 	}
 	else if(email != emailVerify){
-		res.redirect('/newuserErrorMatchingEmail');
+		req.session.errorMessage = "Email fields do not match";
+		res.redirect('/newuser');
 	}
 
 	//otherwise check if user already exists, if they do give them a redirect and an error, otherwise put them into the database 
@@ -121,11 +121,14 @@ app.post('/newuser', function(req, res){
 			if(!name){
 				console.log('user does not exists, adding db entry');
 				db.create_user(username, password, email);
-				res.redirect('/indexUserCreated');
+				req.session.errorMessage = "";
+				req.session.infoMessage = "Your account has been created please login";
+				res.redirect('/');
 			}
 			else{
 				console.log('user exists');
-				res.redirect('/newuserErrorUserExists');
+				req.session.errorMessage = "Username already exists";
+				res.redirect('/newuser');
 			}
 		});
 	}
@@ -179,13 +182,16 @@ app.post('/emailpassword', function(req, res){
 				}
 				smtpTransport.close();
 			});
-			res.redirect('/indexEmailSent');
+			req.session.errorMessage = "";
+			req.session.infoMessage = "Your password had been sent to your email address";
+			res.redirect('/');
 		}
 
 		//redirect to forgot password page with error message
 		else{
 			console.log("user does not exists: cannot send email");
-			res.redirect('/emailpasswordError');
+			req.session.errorMessage = "Username does not exists: cannot send email";
+			res.redirect('/emailpassword');
 		}
 	});
 });
