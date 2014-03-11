@@ -96,7 +96,7 @@
             if (valid_move(from_square, to_square, dim)) {
                 // if valid, submit
                 socket.emit('move_submit', {room: "<%= room %>", from: from_square, to: to_square});
-                console.log("Move submitted");
+                 console.log("Move submitted");
             } else {
                 console.log("Not a valid move");
             }
@@ -191,10 +191,19 @@
     });    
 
     // comes back when a player wins, get's checked after every move
-    socket.on('game_over', function(data) { console.log(data); });
+    socket.on('game_over', function(data) {
+        current_turn = false;
+        alert(data['winner']+" wins! "+data['loser']+' is a LOSER!');
+    });
 
     // server side maze-validation response
-    socket.on('maze_validation', function(data) { console.log(data); });
+    socket.on('maze_validation', function(data) {
+        if (!data['valid_maze']) {
+            $('#log').append('Your maze was not valid. Please fix it and resubmit');
+            $('#log').scrollTop($('#log')[0].scrollHeight);
+        }
+        // console.log(data);
+    });
     /* END: new functions for turn-by-turn gameplay */
 
     function go_home(data) {
@@ -202,10 +211,6 @@
     }
 
     function log_turn(to, from, player, valid, won) {
-        if (won) {
-            $("#log").appened(player+" WINS!\n");
-            return;
-        }
         if (valid) {
             $("#log").append(player+" moved from: "+from+" to: "+to+"\n");
         } else {
