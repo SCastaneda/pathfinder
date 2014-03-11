@@ -18,8 +18,11 @@ a {
 .square {
     width: 50px;
     height: 50px;
-    background-color: #2980b9;
     display: inline-block;
+}
+
+.square:not(.start):not(.end) {
+    background-image: url(/images/Square.jpg);
 }
 
 .wall {
@@ -37,15 +40,23 @@ a {
     height: 50px;
 }
 
+.wall.wall-horizontal.red {
+    background-image: url(/images/WallHor.png);
+    width: 50px;
+    height: 20px;
+}
+
+.wall.wall-vertical.red {
+    background-image: url(/images/WallVert.png);
+    width: 20px;
+    height: 50px;
+}
+
 .spacer {
     width: 20px;
     height: 20px;
     display: inline-block;
 
-    background-color: #e74c3c;
-}
-
-.red {
     background-color: #e74c3c;
 }
 
