@@ -21,7 +21,7 @@ a {
     display: inline-block;
 }
 
-.square:not(.start):not(.end) {
+.square:not(.start):not(.end):not(.current):not(.selected) {
     background-image: url(/images/Square.jpg);
 }
 
@@ -58,6 +58,23 @@ a {
     display: inline-block;
 
     background-color: #e74c3c;
+}
+
+.red {
+    background-color: #e74c3c;
+}
+
+.hidden {
+    background-color: Gray;
+}
+
+.selected {
+    background-color: Black;
+}
+
+.current {
+    background-color: White;
+    !important;
 }
 
 .start {
