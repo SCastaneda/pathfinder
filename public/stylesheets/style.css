@@ -49,6 +49,19 @@ a {
     background-color: #e74c3c;
 }
 
+.hidden {
+    background-color: Gray;
+}
+
+.selected {
+    background-color: Black;
+}
+
+.current {
+    background-color: White;
+    !important;
+}
+
 .start {
     background-color: Green;
 }

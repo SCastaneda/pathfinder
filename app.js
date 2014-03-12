@@ -53,7 +53,7 @@ app.post('/ready', function(req, res) {
 
     // now let's redirect him to the ready page
     res.redirect('/ready');
-})
+});
 
 // the server variable will be necessary for socket.io
 var server = http.createServer(app).listen(app.get('port'), function(){
