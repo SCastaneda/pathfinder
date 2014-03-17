@@ -65,12 +65,14 @@ app.post('/login', function(req, res) {
   
 	db.get_user(name, function(username, pass, salt, mail, wins, losses){
 
+		if(username == name){
+
 		db.hash_password(password, salt, function(hash){
 
 		console.log("salt: " + salt);
 		console.log("hash: " + hash);
 
-		if((name == username) && (hash == pass)){
+		if(hash == pass){
 
 			req.session.name = name;
 			req.session.wins = wins;
@@ -81,13 +83,14 @@ app.post('/login', function(req, res) {
 
 			res.redirect('/profile');
 		}
+		});
+		}
 		else{
 			console.log('failed login');
 			req.session.errorMessage = "Invalid username or password";
 			req.session.infoMessage = "";
 			res.redirect('/');
 		}
-		});
 	});
 });
 //post for new user page
