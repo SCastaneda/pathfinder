@@ -8,7 +8,11 @@
         <td><div id="opp_board"></div></td>
     </tr>
     <tr id="info_row">
-        <td><textarea id="chat" style="resize:none" cols="40" rows="5" readonly></textarea></td>
+        <td>
+          <div id="chat"></div><br>
+          <input type="text" id="new_message" onkeydown="if (event.keyCode == 13) sendMessage();">
+          <button onclick="sendMessage()">send</button>
+        </td>
         <td><textarea id="log" style="resize:none" data-role="none" cols="40" rows="5" readonly></textarea></td>
     </tr>
 </table>
@@ -34,13 +38,31 @@
     var socket = io.connect("");
     socket.emit('join_room', {room: '<%= room %>'});
 
-    // START: stubs for chat 
+    // START: stubs for chat
     // to handle incoming messages:
-    socket.on('broadcast_message', function(data) { console.log(data); });
+    socket.on('broadcast_message', displayMessage);
+
+    function displayMessage(data) {
+        var new_message = '<strong>' + data.by + '</strong>' + " " + data.message + "<br>";
+        var all_messages = $('#chat').html() + new_message;
+        $('#chat').html(all_messages);
+        var div = document.getElementById("chat");
+        div.scrollTop = div.scrollHeight - div.clientHeight;
+    }
 
     // to send messages:
-    //socket.emit('send_message', {message: "Hi"});
-    // END: stubs for chat 
+    function sendMessage() {
+        // store
+        var message = $('#new_message').val();
+        // don't send empty messages
+        if(message == '') { return false; }
+
+        // clear new message box
+        $('#new_message').val('');
+        socket.emit('send_message', { message: message });
+    }
+
+    // END: stubs for chat
 
     socket.on('disconnect', go_home);
     socket.on('start_create_maze_phase', function(data) {
@@ -56,13 +78,13 @@
     $('#ready_btn').on('click', function() {
         // validate maze on server side
         // if it has been validated, we can emit 'player_ready'
-        socket.emit('player_ready', 
-            {   name: "<%= name %>", 
-                room: "<%= room %>", 
-                edge_map: edge_map, 
+        socket.emit('player_ready',
+            {   name: "<%= name %>",
+                room: "<%= room %>",
+                edge_map: edge_map,
                 true_connections: connections,
                 start: maze.getStartId(),
-                end: maze.getEndId()  
+                end: maze.getEndId()
             }
         );
     });
@@ -80,12 +102,12 @@
 
         //
         // ***FIX ME***
-        // 
+        //
         from_square = 0;
         start = 0;
         $("#o"+from_square).removeClass("start").addClass("current");
 
-        // Creates a new board element, this will be what the user uses 
+        // Creates a new board element, this will be what the user uses
         // to see their progress and make their next move
         create_board_html("#opp_board", dim, true);
 
@@ -106,7 +128,7 @@
 
     /* START: new functions for turn-by-turn gameplay */
     // to submit a move to the server:
-    
+
 
     // this comes back after a move was submitted:
     socket.on('move_response', function(data) {
@@ -141,7 +163,7 @@
             to_square = null;
         }
 
-        // console.log(data); 
+        // console.log(data);
     });
 
     // this comes back when it's the other player's turn
@@ -188,7 +210,7 @@
 
         $('#submit').removeAttr('disabled');
         current_turn = true;
-    });    
+    });
 
     // comes back when a player wins, get's checked after every move
     socket.on('game_over', function(data) {
@@ -216,7 +238,7 @@
         } else {
             $("#log").append(player+" tried to move from: "+from+" to: "+to+", but FAILED HORRIBLY.\n");
         }
-        
+
         $('#log').scrollTop($('#log')[0].scrollHeight);
     }
 
