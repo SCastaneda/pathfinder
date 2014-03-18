@@ -53,11 +53,16 @@ exports.changePassword = function(req, res){
 exports.changeEmail = function(req, res){
 	
 	if(req.session.name){
-
-		res.render('changeEmail');
+		if(req.session.errorMessage){
+			res.render('changeEmail', {errorMessage: req.session.errorMessage});
+		}
+		else{
+			res.render('changeEmail', {errorMessage: ""});
+		}
 	}
 	else{
 		res.redirect('/');
 	}
+	req.session.errorMessage = "";
 };
 

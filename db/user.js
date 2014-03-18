@@ -56,6 +56,20 @@ exports.get_user = function(username, cb) {
     });
 }
 
+exports.check_email = function(email, cb){
+	userModel.findOne({email: email}, function(err, user){
+	if(err) {throw err;}
+	if(user == null){
+		console.log("email does not exist");
+		return cb(null);
+	}
+	else{
+		console.log("email exists");
+		return cb(user.email);
+	}
+	});
+}
+
 exports.resetPassword = function(username, password, cb){
 
 	console.log("testing: db changePassword reached.");

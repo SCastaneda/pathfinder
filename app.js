@@ -83,6 +83,13 @@ app.post('/login', function(req, res) {
 
 			res.redirect('/profile');
 		}
+		else{
+
+			console.log('failed login');
+			req.session.errorMessage = "Invalid username or password";
+			req.session.infoMessage = "";
+			res.redirect('/');
+		}
 		});
 		}
 		else{
@@ -120,7 +127,7 @@ app.post('/newuser', function(req, res){
 	//else if passwords or emails dont match redirect them with an error
 	else if(password != passwordVerify){
 
-		req.session.errorMessage = "Password feilds do not match";
+		req.session.errorMessage = "Password fields do not match";
 		res.redirect('/newuser');	
 	}
 
@@ -129,6 +136,11 @@ app.post('/newuser', function(req, res){
 		db.get_user(username, function(name, pass, mail, salt, wins, losses){
 	
 			if(!name){
+				
+				db.check_email(email, function(emailExists){
+
+				if(!emailExists){
+
 				console.log('user does not exists, adding db entry');
 				db.create_user(username, password, email, function(created){
 				if(created){
@@ -141,13 +153,20 @@ app.post('/newuser', function(req, res){
 					res.redirect('/');
 				}
 				});
+				}
+				else{
+					console.log('email exists');
+					req.session.errorMessage = "Email already exists";
+					res.redirect('/newuser');
+				}
+				});
 			}
 			else{
 				console.log('user exists');
 				req.session.errorMessage = "Username already exists";
 				res.redirect('/newuser');
 			}
-		});
+			});
 	}
 
 });
@@ -290,6 +309,15 @@ app.post('/changeEmail', function(req, res){
 
 	console.log("testing change email submit");
 
+	if(email == ""){
+		req.session.errorMessage = "All fields required";
+		res.redirect('/changeEmail');
+	}
+	else{
+	db.check_email(email, function(email_exists){
+	
+	if(!email_exists){
+
 	db.changeEmail(email, req.session.name, function(updated){
 		if(updated){
 					
@@ -301,6 +329,14 @@ app.post('/changeEmail', function(req, res){
 			res.redirect('/profile');
 		}
 	});
+	}
+	else{
+		req.session.errorMessage = "Email already exists";
+		console.log('email already exists');
+		res.redirect('/changeEmail');
+	}
+	});
+	}
 });
 
 
