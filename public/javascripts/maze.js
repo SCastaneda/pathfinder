@@ -2,6 +2,7 @@ var maze;
 var start = true, end = true, disable_board_modify = false, current_turn = false;
 var from_square = null, to_square = null;
 var other_current = null;
+var maze_size;
 
 // edge map will hold all the connections, regardless if connected or not
 var edge_map = [];
@@ -26,6 +27,7 @@ function create_board_html(divID, dim, emptyBoard) {
     var current_square = 0;
     var id_prefix = (emptyBoard)? "o": "s";
     var wall_id_prefix = (emptyBoard)? "w": "";
+    maze_size = dim;
 
     for(var i = 0; i < dim; i++) {
         // This is the div to hold the row of spacers and walls
@@ -416,6 +418,11 @@ function valid_move(from, to, dim) {
     if (from === null || to === null) {
         return false;
     } else if (Math.abs(from-to) === dim || Math.abs(from-to) === 1) {
+        if (from%maze_size === 0 && to === from-1) {
+            return false;
+        } else if (to%maze_size ===0 && from === to-1) {
+            return false;
+        }
         return true;
     } else {
         return false;
