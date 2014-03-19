@@ -2,20 +2,49 @@
 
 <div id='announcements'>Waiting on other player to join</div>
 
-<table>
-    <tr id="board_row">
-        <td><div id="board"></div></td>
-        <td><div id="opp_board"></div></td>
-    </tr>
-    <tr id="info_row">
-        <td><textarea id="chat" style="resize:none" cols="40" rows="5" readonly></textarea></td>
-        <td><textarea id="log" style="resize:none" data-role="none" cols="40" rows="5" readonly></textarea></td>
-    </tr>
-</table>
+<div class='container'>
+    <div class='row'>
+        <div class='col-xs-4 col-xs-4'>
+            <!--  -->
+            <div id="board"></div>
+        </div>
+        <div class='col-xs-4 col-xs-4'>
+            <!--  -->
+            <div id="opp_board"></div>
+        </div>
+    </div>
+    </br>
+    <div class='row'>
+        <div class='col-xs-4 col-xs-4'>
+            <textarea id="chat" style="resize:none" cols="40" rows="5" readonly></textarea>
+        </div>
+        <div class='col-xs-4 col-xs-4'>
+            <textarea id="log" style="resize:none" data-role="none" cols="40" rows="5" readonly></textarea>
+        </div>
+    </div>
+</div>
 
 <button id="ready_btn">I'm Ready!</button>
 
-
+<!-- Modal -->
+<div class="modal fade" id="theModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="theModalTitle">
+                    <!-- Title text gets put here -->
+                </h4>
+            </div>
+            <div class="modal-body" id="theModalBody">
+                <!-- Body text gets put here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script type="text/javascript">
     function toggle_ready_button(state) {
@@ -194,6 +223,7 @@
     socket.on('game_over', function(data) {
         current_turn = false;
         alert(data['winner']+" wins! "+data['loser']+' is a LOSER!');
+        showModal('Game over!', data['winner']+" wins! "+data['loser']+" just needs to realise that winning isn't everything. You'll get 'em next time tiger!");
     });
 
     // server side maze-validation response
@@ -218,6 +248,12 @@
         }
         
         $('#log').scrollTop($('#log')[0].scrollHeight);
+    }
+
+    function showModal(title, body) {
+        $('#theModalTitle').html(title);
+        $('#theModalBody').html(body);
+        $('#theModal').modal('show');
     }
 
 </script>

@@ -64,10 +64,6 @@ a {
     background-color: #e74c3c;
 }
 
-.hidden {
-    background-color: Gray;
-}
-
 .selected {
     background-color: Black;
 }

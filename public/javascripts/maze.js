@@ -55,12 +55,12 @@ function create_board_html(divID, dim, emptyBoard) {
                 $(wall_square).append($("<div>", {class: "wall wall-vertical red"}), square);                   
 
             } else if (j === 0 && emptyBoard) {
-                var square = $("<div>", {class: "square hidden", id: id_prefix+current_square}).click(toggle);
+                var square = $("<div>", {class: "square", id: id_prefix+current_square}).click(toggle);
                 $(wall_square).append($("<div>", {class: "wall wall-vertical red"}), square);
 
             } else if (emptyBoard) {
                 var wall = $("<div>", {class: "wall wall-vertical", id: wall_id_prefix+current_wall}).click(toggle);
-                var square = $("<div>", {class: "square hidden", id: id_prefix+current_square}).click(toggle)
+                var square = $("<div>", {class: "square", id: id_prefix+current_square}).click(toggle)
                 $(wall_square).append(wall, square);
                 current_wall++;
             } else if (j === 0) {
