@@ -80,3 +80,12 @@ a {
 .end {
     background-color: Gold;
 }
+
+#chat {
+  border: 1px solid #7d7d7d;
+  width: 350px;
+  height: 75px;
+  overflow: scroll;
+  margin-top: 30px;
+  padding: 5px;
+}
