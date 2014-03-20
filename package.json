@@ -15,6 +15,7 @@
     "bcrypt": "0.7.*",
     "session.socket.io": "0.1.*",
     "connect": "2.12.*",
-    "nodemailer": "^0.6.1"
+    "nodemailer": "^0.6.1",
+    "validator": "2.0.*"
   }
 }
