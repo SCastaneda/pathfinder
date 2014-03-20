@@ -345,4 +345,3 @@ exports.changeMail = function(req, res){
 	});
 	}
 };
-
