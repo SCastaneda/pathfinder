@@ -1,4 +1,4 @@
-var dim, start;
+var dim, start, room;
 var socket = io.connect("");
 
 socket.emit('join_room', {room: '<%= room %>'});
@@ -44,35 +44,6 @@ socket.on('waiting_on_other_player', function() {
     $('#announcements').html('waiting on the other player...');
 });
 
-socket.on('start_play_phase', function(data) {
-    $('#announcements').html("Play phase started!");
-
-    disable_board_modify = true;
-
-    //
-    // ***FIX ME***
-    //
-    from_square = 0;
-    start = 0;
-    $("#o"+from_square).removeClass("start").addClass("current");
-
-    // Creates a new board element, this will be what the user uses
-    // to see their progress and make their next move
-    create_board_html("#opp_board", dim, true);
-
-    $('#ready_btn').remove();
-    $('#board_row').append($("<button>", {id: "submit", text:"Submit"}).wrap("<td></td>").click(function() {
-        // check if it could be a valid move. This does not check if the player has already
-        // found a wall here.
-        if (valid_move(from_square, to_square, dim)) {
-            // if valid, submit
-            socket.emit('move_submit', {room: "<%= room %>", from: from_square, to: to_square});
-             console.log("Move submitted");
-        } else {
-            console.log("Not a valid move");
-        }
-    }));
-});
 
 // this comes back after a move was submitted:
 socket.on('move_response', function(data) {
@@ -179,10 +150,10 @@ function go_home(data) {
 
 function log_turn(to, from, player, valid, won) {
     if (valid) {
-        $("#log").append(player + " moved from: " + from + " to: " + to + "\n");
+        $("#log").append(player + " moved from: " + from + " to: " + to + "<br>");
     } else {
         $("#log").append(player+" tried to move from: " + from + " to: " +
-            to + ", but FAILED HORRIBLY.\n");
+            to + ", but FAILED HORRIBLY.<br>");
     }
 
     $('#log').scrollTop($('#log')[0].scrollHeight);

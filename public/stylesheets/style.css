@@ -57,7 +57,7 @@ a {
     height: 20px;
     display: inline-block;
 
-    background-color: #e74c3c;
+    background-image: url(/images/WallVert.png);
 }
 
 .red {
@@ -88,4 +88,13 @@ a {
   overflow: scroll;
   margin-top: 30px;
   padding: 5px;
+}
+
+#log {
+    border: 1px solid #7d7d7d;
+    width: 350px;
+    height: 75px;
+    overflow: scroll;
+    margin-top: 30px;
+    padding: 5px;
 }
