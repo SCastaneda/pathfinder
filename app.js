@@ -71,7 +71,6 @@ app.post('/findgame', function(req, res){
 });
 
 app.post('/changePassword', routes_user.changepw);
-
 app.post('/changeEmail', routes_user.changeMail);
 
 // the server variable will be necessary for socket.io
@@ -82,5 +81,3 @@ var server = http.createServer(app).listen(app.get('port'), function(){
 
 var io = require("socket.io").listen(server);
 game_sockets.start(io, cookieParser, sessionStore);
-
-
