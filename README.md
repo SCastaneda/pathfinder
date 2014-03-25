@@ -1,7 +1,11 @@
 pathfinder
 ==========
 
-Project for COP4331
+A turn-based game that allows two players to build mazes for each other that each must go through blind.
+First player to find the exit wins.
+Play with your friends [here](http://sam-the-man.com:3000)
+**Note:**
+The game is still in development, and will have some kinks in it, feel free to report them via the Issues.
 
 ###To Start
 To run the server on your local machine, first start the database.
@@ -41,7 +45,3 @@ for the project (defined in package.json) you can just run
 `npm install`
 in the terminal. If you get an EACCESS error, try runnning it with 
 `sudo npm install` to run it as the superuser (password entry will be required). I'm not sure if there's an equivalent for windows.
-
-Let Sam or **Patrick** know if you need help with any of the installations.
-
-Mark is testing
