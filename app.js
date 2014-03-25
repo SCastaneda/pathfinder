@@ -10,9 +10,15 @@ var express  = require('express');
 var partials = require('express-partials');
 
 var routes   = require('./routes');
+var routes_user = require('./routes/user');
+
 var room     = require('./routes/room');
 var game_sockets = require('./game-sockets');
 
+var db       = require('./db/user');
+
+var nodemailer = require("nodemailer");
+var crypto   = require('crypto');
 var app = express();
 
 var cookieParser = express.cookieParser('JAHAUSnajksdjKAHSD819238127389');
@@ -43,17 +49,29 @@ if ('development' == app.get('env')) {
 app.get('/', routes.index);
 app.get('/ready', room.waiting);
 app.get('/play/:hash', room.play);
+app.get('/emailPassword', routes_user.emailpassword);
+app.get('/newuser', routes_user.newuser);
+app.get('/profile', routes_user.profile);
+app.get('/changePassword', routes_user.changePassword);
+app.get('/changeEmail', routes_user.changeEmail);
 
-app.post('/ready', function(req, res) {
-    // get the name the user entered
-    var name = req.body.name;
+app.post('/login', routes_user.login);
 
-    // here we save the name of the user in the session
-    req.session.name = name;
+//post for new user page
+app.post('/newuser', routes_user.createUser);
 
-    // now let's redirect him to the ready page
-    res.redirect('/ready');
+//post for forgot password page
+app.post('/emailpassword', routes_user.getPassword);
+
+app.post('/findgame', function(req, res){
+
+	console.log("testing profile post");
+	res.redirect('/ready');
+
 });
+
+app.post('/changePassword', routes_user.changepw);
+app.post('/changeEmail', routes_user.changeMail);
 
 // the server variable will be necessary for socket.io
 var server = http.createServer(app).listen(app.get('port'), function(){
@@ -63,5 +81,3 @@ var server = http.createServer(app).listen(app.get('port'), function(){
 
 var io = require("socket.io").listen(server);
 game_sockets.start(io, cookieParser, sessionStore);
-
-

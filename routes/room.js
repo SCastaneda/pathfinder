@@ -5,7 +5,6 @@
 */
 var db_room = require("../db/rooms");
 
-
 exports.waiting = function(req, res){
 
     if(req.session.name) {
