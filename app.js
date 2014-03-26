@@ -54,6 +54,7 @@ app.get('/newuser', routes_user.newuser);
 app.get('/profile', routes_user.profile);
 app.get('/changePassword', routes_user.changePassword);
 app.get('/changeEmail', routes_user.changeEmail);
+app.get('/logout', routes_user.logout);
 
 app.post('/login', routes_user.login);
 

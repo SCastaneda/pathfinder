@@ -5,6 +5,11 @@
 
 exports.index = function(req, res){
 
+	if(req.session.loggedin){
+		res.redirect('/profile');
+	}
+
+	else{
 	if(req.session.errorMessage || req.session.infoMessage){
 
   		res.render('index', { title: 'Pathfinder' , errorMessage: req.session.errorMessage, infoMessage: req.session.infoMessage});
@@ -15,6 +20,7 @@ exports.index = function(req, res){
   	req.session.name = "";
 	req.session.errorMessage = "";
   	req.session.infoMessage = "";
+	}
 }
 
 
