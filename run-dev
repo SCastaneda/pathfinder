@@ -1,0 +1,2 @@
+#!/bin/bash
+nodemon -e ".js|.html|.css|.ejs" app.js

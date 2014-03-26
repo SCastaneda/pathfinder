@@ -28,18 +28,20 @@ function create_board_html(divID, dim, emptyBoard) {
     var id_prefix = (emptyBoard)? "o": "s";
     var wall_id_prefix = (emptyBoard)? "w": "";
     maze_size = dim;
+    var i;
 
-    for(var i = 0; i < dim; i++) {
+    for(i = 0; i < dim; i++) {
+        var j, wall, square;
         // This is the div to hold the row of spacers and walls
         var wall_row = $("<div>", {class: "row row-walls"});
 
-        for (var j = 0; j < dim; j++) {
+        for (j = 0; j < dim; j++) {
             if (i === 0) {
                 // if it's the very first row, then these need to be all red
                 $(wall_row).append($("<div>", {class: "spacer"}), $("<div>", {class: "wall wall-horizontal red"}));
             } else {
                 // otherwise the walls are grey, are assigned an ID, and get the function attached if they are clicked
-                var wall = $("<div>", {class: "wall wall-horizontal", id: wall_id_prefix+current_wall}).click(toggle);
+                wall = $("<div>", {class: "wall wall-horizontal", id: wall_id_prefix+current_wall}).click(toggle);
                 $(wall_row).append($("<div>", {class: "spacer"}), wall);
                 current_wall++;
             }
@@ -50,37 +52,37 @@ function create_board_html(divID, dim, emptyBoard) {
         // This is the div to hold the row of walls and squares
         var wall_square = $("<div>", {class: "row row-squares"});
 
-        for (var j = 0; j < dim; j++) {
+        for (j = 0; j < dim; j++) {
             if (j === 0 && i === 0) {
                 // The very first square defaults to start
-                var square = $("<div>", {class: "square start", id: id_prefix+current_square}).click(toggle);
-                $(wall_square).append($("<div>", {class: "wall wall-vertical red"}), square);                   
+                square = $("<div>", {class: "square start", id: id_prefix+current_square}).click(toggle);
+                $(wall_square).append($("<div>", {class: "wall wall-vertical red"}), square);
 
             } else if (j === 0 && emptyBoard) {
-                var square = $("<div>", {class: "square hidden", id: id_prefix+current_square}).click(toggle);
+                square = $("<div>", {class: "square", id: id_prefix+current_square}).click(toggle);
                 $(wall_square).append($("<div>", {class: "wall wall-vertical red"}), square);
 
             } else if (emptyBoard) {
-                var wall = $("<div>", {class: "wall wall-vertical", id: wall_id_prefix+current_wall}).click(toggle);
-                var square = $("<div>", {class: "square hidden", id: id_prefix+current_square}).click(toggle)
+                wall = $("<div>", {class: "wall wall-vertical", id: wall_id_prefix+current_wall}).click(toggle);
+                square = $("<div>", {class: "square", id: id_prefix+current_square}).click(toggle);
                 $(wall_square).append(wall, square);
                 current_wall++;
             } else if (j === 0) {
                 // Otherwise just make sure the far left wall is red
-                var square = $("<div>", {class: "square", id: id_prefix+current_square}).click(toggle)
+                square = $("<div>", {class: "square", id: id_prefix+current_square}).click(toggle);
                 $(wall_square).append($("<div>", {class: "wall wall-vertical red"}), square);
 
             } else if (j === dim - 1 && i === dim - 1 && !emptyBoard) {
                 // The very last square defaults to exit
-                var wall = $("<div>", {class: "wall wall-vertical", id: wall_id_prefix+current_wall}).click(toggle);
-                var square = $("<div>", {class: "square end", id: id_prefix+current_square}).click(toggle)
+                wall = $("<div>", {class: "wall wall-vertical", id: wall_id_prefix+current_wall}).click(toggle);
+                square = $("<div>", {class: "square end", id: id_prefix+current_square}).click(toggle);
                 $(wall_square).append(wall, square);
                 current_wall++;
 
             } else {
                 // Otherwise walls need to be grey, assigned an ID, and get the fucntion attached if they are clicked
-                var wall = $("<div>", {class: "wall wall-vertical", id: wall_id_prefix+current_wall}).click(toggle);
-                var square = $("<div>", {class: "square", id: id_prefix+current_square}).click(toggle)
+                wall = $("<div>", {class: "wall wall-vertical", id: wall_id_prefix+current_wall}).click(toggle);
+                square = $("<div>", {class: "square", id: id_prefix+current_square}).click(toggle);
                 $(wall_square).append(wall, square);
                 current_wall++;
             }
@@ -90,12 +92,12 @@ function create_board_html(divID, dim, emptyBoard) {
         $(wall_square).append($("<div>", {class: "wall wall-vertical red"}));
 
         // add the two rows to the board
-        $(divID).append(wall_row, wall_square)
+        $(divID).append(wall_row, wall_square);
     }
 
     // final row of spacers and walls here, identical to the very first row
     var final_row = $("<div>", {class: "row row-walls"});
-    for(var i = 0; i < dim; i++) {
+    for(i = 0; i < dim; i++) {
         $(final_row).append($("<div>", {class: "spacer"}), $("<div>", {class: "wall wall-horizontal red"}));
     }
     $(final_row).append($("<div>", {class: "spacer"}));
@@ -105,11 +107,12 @@ function create_board_html(divID, dim, emptyBoard) {
 // This function will handle all the clicks on the HTML elements
 function toggle(event) {
     var target = event.currentTarget;
-    var id = $(target).attr("id")
+    var id = $(target).attr("id");
+    var index;
 
     if ($(target).hasClass("square")) {
 
-        var index = parseInt(id.slice(1));
+        index = parseInt(id.slice(1));
 
         if ($(target).parents("#opp_board").length == 1) {
             // if the clicked square is the the board we select our next moves on
@@ -158,7 +161,7 @@ function toggle(event) {
             return;
         }
     } else {
-        var index = parseInt(id);
+        index = parseInt(id);
 
         if ($(target).parents("#opp-board").length > 0 || disable_board_modify) {
             return;
@@ -188,14 +191,14 @@ function Square(id) {
 
     // This holds the references to it's neighbors, we're going to start
     // with this not sorted in any way
-    this.neighbors = new Array();
+    this.neighbors = [];
     var end = false;
     var start = false;
 
     // Creates an edge
     this.addNeighbor = function(neighbor) {
         this.neighbors.push(neighbor);
-    }
+    };
 
     // Removes the edges, after checking if it exists
     this.removeNeighbor = function(neighbor) {
@@ -205,41 +208,41 @@ function Square(id) {
         } else {
             console.log("danger!");
         }
-    }
+    };
 
     // Returns true if there is an edge, false otherwise
     this.hasEdge = function(otherSquare) {
         return (this.neighbors.indexOf(otherSquare) > -1);
-    }
+    };
 
     // Simple getter for the ID
     this.getId = function() {
         return id;
-    }
+    };
 
     this.makeEnd = function() {
         end = true;
-    }
+    };
 
     this.makeStart = function() {
         start = true;
-    }
+    };
 
     this.removeEnd = function() {
         end = false;
-    }
+    };
 
     this.removeStart = function() {
         start = false;
-    }
+    };
 
     this.isEnd = function() {
         return end;
-    }
+    };
 
     this.isStart = function() {
         return start;
-    }
+    };
 }
 
 function Maze(dim) {
@@ -252,11 +255,11 @@ function Maze(dim) {
     // console.log(size);
     var squares = new Array(size*size);
     var current;
-    var start, end;
+    var start, end, i;
 
 
     // First, create each square object
-    for (var i = 0; i < size*size; i++) {
+    for (i = 0; i < size*size; i++) {
         squares[i] = new Square(i);
 
         // Defaults for start and end square.
@@ -271,8 +274,8 @@ function Maze(dim) {
     }
 
     // Now we go through and set up the initial edges
-    // Since each square starts off adjacent to each neighbor 
-    for (var i = 0; i < size*size; i++) {
+    // Since each square starts off adjacent to each neighbor
+    for (i = 0; i < size*size; i++) {
 
         // Check if the edge is on the right edge, as they don't have a friend to
         // their right if so
@@ -290,35 +293,35 @@ function Maze(dim) {
 
     this.getStartId = function() {
         return start.getId();
-    }
+    };
 
     this.getEndId = function() {
         return end.getId();
-    }
+    };
 
     this.getSquares = function() {
         return squares;
-    }
+    };
 
     this.removeStart = function() {
         start.removeStart();
         start = null;
-    }
+    };
 
     this.removeEnd = function() {
         end.removeEnd();
         end = null;
-    }
+    };
 
     this.addStart = function(index) {
         start = squares[index];
         start.makeStart();
-    }
+    };
 
     this.addEnd = function(index) {
         end = squares[index];
         end.makeEnd();
-    }
+    };
 
     this.removeEdge = function(a, b) {
         squares[a].removeNeighbor(squares[b]);
@@ -326,7 +329,7 @@ function Maze(dim) {
         console.log("Removing Edge from map: a: " + a + "b: " + b );
         remove_edge_from_connections(a, b);
         console.log(connections);
-    }
+    };
 
     this.addEdge = function(a, b) {
         squares[a].addNeighbor(squares[b]);
@@ -334,20 +337,21 @@ function Maze(dim) {
         console.log("Adding Edge to map: a: " + a + "b: " + b );
         add_edge_to_connections(a, b);
         console.log(connections);
-    }
+    };
 
     this.verify = function() {
+        var i;
 
         if (start === null || end === null) {
             return false;
         }
 
-        var visited = new Array();
-        for (var i = 0; i < size*size; i++) {
+        var visited = [];
+        for (i = 0; i < size*size; i++) {
             visited[i] = false;
         }
 
-        var stack = new Array();
+        var stack = [];
         stack.push(start);
 
         while (stack.length > 0) {
@@ -357,20 +361,20 @@ function Maze(dim) {
             if (current === end) {
                 return true;
             }
-            
-            for (var i = 0; i < current.neighbors.length; i++) {
+
+            for (i = 0; i < current.neighbors.length; i++) {
                 if (!visited[current.neighbors[i].getId()]) {
                     stack.push(current.neighbors[i]);
                 }
             }
         }
         return false;
-    }
+    };
 }
 
 function remove_edge_from_connections(a,b) {
     var n = connections.length;
-    
+
     for(var i = 0; i < n; i++){
         if(connections[i].a == a && connections[i].b == b) {
             connections.splice(i, 1);
@@ -378,7 +382,7 @@ function remove_edge_from_connections(a,b) {
         } else if(connections[i].a == b && connections[i].b == a) {
             connections.splice(i, 1);
             return;
-        } 
+        }
     }
     console.log("Trying to remove invalid edge");
 }
@@ -389,7 +393,7 @@ function add_edge_to_connections(a,b) {
     } else {
         connections.push({ a:b, b:a });
     }
-} 
+}
 
 function make_edge_Map(dim) {
     var size = parseInt(dim);
@@ -437,7 +441,7 @@ function get_wall_id(from, to, dim) {
 
     if (Math.abs(from-to) === 1) {
         // The wall was to the right or left of the current square
-    
+
         if (from - to > 0) {
             // Wall is to the left of "from"
             var to_col = from_col - 1;
