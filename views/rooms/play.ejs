@@ -2,25 +2,57 @@
 
 <div id='announcements'>Waiting on other player to join</div>
 
-<table>
-    <tr id="board_row">
-        <td><div id="board"></div></td>
-        <td><div id="opp_board"></div></td>
-    </tr>
-    <tr id="info_row">
-        <td>
-          <div id="chat"></div><br>
-          <input type="text" id="new_message" onkeydown="if (event.keyCode == 13) sendMessage();">
-          <button onclick="sendMessage()">send</button>
-        </td>
-        <td><textarea id="log" style="resize:none" data-role="none" cols="40" rows="5" readonly></textarea></td>
-    </tr>
-</table>
+<div class='container'>
+    <div class='row' id="board_row">
+        <div class='col-xs-4 col-xs-4'>
+            <!--  -->
+            <div id="board"></div>
+        </div>
+        <div class='col-xs-4 col-xs-4'>
+            <button id="ready_btn">I'm Ready!</button>
+            <!--  -->
+            <div id="opp_board"></div>
+        </div>
+    </div>
 
-<button id="ready_btn">I'm Ready!</button>
+    </br>
 
+    <div class='row'>
+        <div class='col-xs-4 col-xs-4'>
+            <div class="well" id="chat"></div><br>
+            <input type="text" id="new_message" onkeydown="if (event.keyCode == 13) sendMessage();">
+            <button onclick="sendMessage()">send</button>
+        </div>
 
+        <div class='col-xs-4 col-xs-4'>
+            <div class="well" id="log"></div>
+        </div>
+    </div>
+</div>
 
+<!-- Modal -->
+<div class="modal fade" id="theModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="theModalTitle">
+                    <!-- Title text gets put here -->
+                </h4>
+            </div>
+            <div class="modal-body" id="theModalBody">
+                <!-- Body text gets put here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src='/javascripts/maze.js'></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src='/javascripts/play.js'></script>
 <script type="text/javascript">
     function toggle_ready_button(state) {
         if(state) {
@@ -28,52 +60,7 @@
         } else {
             $('#ready_btn').attr('disabled', 'disabled');
         }
-    }
-
-</script>
-<script src='/javascripts/maze.js'></script>
-<script src="/socket.io/socket.io.js"></script>
-<script type="text/javascript">
-    var dim, start;
-    var socket = io.connect("");
-    socket.emit('join_room', {room: '<%= room %>'});
-
-    // START: stubs for chat
-    // to handle incoming messages:
-    socket.on('broadcast_message', displayMessage);
-
-    function displayMessage(data) {
-        var new_message = '<strong>' + data.by + '</strong>' + " " + data.message + "<br>";
-        var all_messages = $('#chat').html() + new_message;
-        $('#chat').html(all_messages);
-        var div = document.getElementById("chat");
-        div.scrollTop = div.scrollHeight - div.clientHeight;
-    }
-
-    // to send messages:
-    function sendMessage() {
-        // store
-        var message = $('#new_message').val();
-        // don't send empty messages
-        if(message == '') { return false; }
-
-        // clear new message box
-        $('#new_message').val('');
-        socket.emit('send_message', { message: message });
-    }
-
-    // END: stubs for chat
-
-    socket.on('disconnect', go_home);
-    socket.on('start_create_maze_phase', function(data) {
-
-        // assigning this variable to access later when we create the new board element
-        // this may not be needed
-        dim = data['maze_dim'];
-
-        generate_board(data['maze_dim']);
-        $('#announcements').html("Build your maze, and click 'I'm ready', when you're done!");
-    });
+    };
 
     $('#ready_btn').on('click', function() {
         // validate maze on server side
@@ -89,157 +76,33 @@
         );
     });
 
-    socket.on('waiting_on_other_player', function() {
-        $('#ready_btn').html('waiting on the other player!');
-        $('#ready_btn').attr('disabled', 'disabled');
-        $('#announcements').html('waiting on the other player...');
-    });
-
     socket.on('start_play_phase', function(data) {
-        $('#announcements').html("Play phase started!");
+    $('#announcements').remove();
 
-        disable_board_modify = true;
+    disable_board_modify = true;
 
-        //
-        // ***FIX ME***
-        //
-        from_square = 0;
-        start = 0;
-        $("#o"+from_square).removeClass("start").addClass("current");
+    //
+    // ***FIX ME***
+    //
+    from_square = data.start;
+    start = data.start;
+    $("#o"+from_square).removeClass("start").addClass("current");
 
-        // Creates a new board element, this will be what the user uses
-        // to see their progress and make their next move
-        create_board_html("#opp_board", dim, true);
+    // Creates a new board element, this will be what the user uses
+    // to see their progress and make their next move
+    create_board_html("#opp_board", dim, true, start);
 
-        $('#ready_btn').remove();
-        $('#board_row').append($("<button>", {id: "submit", text:"Submit"}).wrap("<td></td>").click(function() {
-            // check if it could be a valid move. This does not check if the player has already
-            // found a wall here.
-            if (valid_move(from_square, to_square, dim)) {
-                // if valid, submit
-                socket.emit('move_submit', {room: "<%= room %>", from: from_square, to: to_square});
-                 console.log("Move submitted");
-            } else {
-                console.log("Not a valid move");
-            }
-        }));
-    });
-
-
-    /* START: new functions for turn-by-turn gameplay */
-    // to submit a move to the server:
-
-
-    // this comes back after a move was submitted:
-    socket.on('move_response', function(data) {
-        if (data['move']) {
-            // if the move was validated by the server
-            log_turn(to_square, from_square, "You", true, false);
-            // Update the html
-            $("#o"+from_square).removeClass("current");
-            $("#o"+to_square).removeClass("selected");
-            $("#o"+to_square).addClass("current");
-
-            // if from_square was the start square
-            if (from_square === start) {
-                $("#o"+from_square).addClass("start");
-            }
-
-            // from because the old to, the new to_square doesn't exist yet
-            from_square = to_square;
-            to_square = null;
+    $('#ready_btn').remove();
+    $('#board_row').append($("<button>", {id: "submit", text:"Submit"}).wrap("<td></td>").click(function() {
+        // check if it could be a valid move. This does not check if the player has already
+        // found a wall here.
+        if (valid_move(from_square, to_square, dim)) {
+            // if valid, submit
+            socket.emit('move_submit', {room: "<%= room %>", from: from_square, to: to_square});
+             console.log("Move submitted");
         } else {
-            // Move blocked by wall
-
-            log_turn(to_square, from_square, "You", false, false);
-
-            // get the id of the blocking wall and show a wall there
-            var id = get_wall_id(from_square, to_square, dim);
-            // console.log("wall id:"+id);
-            $("#w"+id).addClass("red");
-
-            // reset selected square;
-            $("#o"+to_square).removeClass("selected");
-            to_square = null;
+            console.log("Not a valid move");
         }
-
-        // console.log(data);
-    });
-
-    // this comes back when it's the other player's turn
-    socket.on('other_players_turn', function(data) {
-        // console.log("it's the other player's turn");
-        $("#log").append("It's the other player's turn.\n");
-        $('#log').scrollTop($('#log')[0].scrollHeight);
-
-        $('#submit').attr('disabled', 'disabled');
-        current_turn = false;
-
-        // initialize the other player's position if it's the first round
-        if (other_current === null) {
-            other_current = maze.getStartId();
-            $('#s'+other_current).addClass('current');
-        }
-    });
-
-    // this comes back when it's your turn
-    socket.on('your_turn', function(data) {
-
-        if (other_current !== null) {
-            // if it's not the first round
-
-            // log the other players turn
-            log_turn(data['to'], data['from'], "The other guy", data['move'], false);
-            if (data['move']) {
-                other_current = data['to'];
-
-                // update the html
-                $('#s'+data['from']).removeClass('current');
-                $('#s'+data['to']).addClass('current');
-            }
-
-        } else {
-            // if it's the first round
-            other_current = maze.getStartId();
-            $('#s'+other_current).addClass('current');
-        }
-
-        // log
-        $("#log").append("It's your turn!\n");
-        $('#log').scrollTop($('#log')[0].scrollHeight);
-
-        $('#submit').removeAttr('disabled');
-        current_turn = true;
-    });
-
-    // comes back when a player wins, get's checked after every move
-    socket.on('game_over', function(data) {
-        current_turn = false;
-        alert(data['winner']+" wins! "+data['loser']+' is a LOSER!');
-    });
-
-    // server side maze-validation response
-    socket.on('maze_validation', function(data) {
-        if (!data['valid_maze']) {
-            $('#log').append('Your maze was not valid. Please fix it and resubmit');
-            $('#log').scrollTop($('#log')[0].scrollHeight);
-        }
-        // console.log(data);
-    });
-    /* END: new functions for turn-by-turn gameplay */
-
-    function go_home(data) {
-        window.location.replace("/");
-    }
-
-    function log_turn(to, from, player, valid, won) {
-        if (valid) {
-            $("#log").append(player+" moved from: "+from+" to: "+to+"\n");
-        } else {
-            $("#log").append(player+" tried to move from: "+from+" to: "+to+", but FAILED HORRIBLY.\n");
-        }
-
-        $('#log').scrollTop($('#log')[0].scrollHeight);
-    }
-
+    }));
+});
 </script>

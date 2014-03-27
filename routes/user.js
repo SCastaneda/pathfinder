@@ -47,17 +47,6 @@ exports.login = function(req, res){
 		}
 	});
 };
-
-//renders newuser and forgot password pages
-exports.newuser = function(req, res){
-	
-	if(req.session.errorMessage){
-		res.render('newuser', {errorMessage: req.session.errorMessage});
-	}
-	else{
-		res.render('newuser', {errorMessage: ''});
-	}
-};
 exports.emailpassword = function(req, res){
 
 	if(req.session.errorMessage){
