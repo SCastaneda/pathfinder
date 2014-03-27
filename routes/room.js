@@ -30,5 +30,13 @@ exports.play = function(req, res) {
             res.redirect('/ready');
         }
     });
-    
 };
+
+exports.lobby = function(req, res) {
+    if(req.session.name) {
+        //
+        res.render('rooms/lobby', {name: req.session.name});
+    } else {
+        res.redirect('/');
+    }
+}

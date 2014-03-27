@@ -1,0 +1,40 @@
+<div class="container-fluid" style="width:70%;">
+	<div class="row">
+		<div class="col-md-10 well" id="lobbyChat">
+			<!-- Chat goes here -->
+		</div>
+		<div class="col-md-2 well" id="lobbyUserList">
+			<!-- User list goes here -->
+		</div>
+	</div>
+	<div class="row">
+		<input type="text" id="new_message" onkeydown="if (event.keyCode == 13) sendMessage();">
+        <button type="button" class="btn btn-primary btn-sm"onclick="sendMessage()">send</button>
+	</div>
+</div>
+
+<script type="text/javascript">
+for (var i=0; i<200; i++) {
+	// var user = "User"+i+"<br>";
+	var user = $("<button>", {class:"btn btn-default", type:"button"})
+				.attr("data-container", "body")
+				.attr("data-toggle", "popover")
+				.attr("data-placement", "left")
+				.attr("data-content", "User content goes here")
+				.append("User"+i);
+
+	$('#lobbyUserList').append(user);
+    $('#lobbyUserList').scrollTop($('#lobbyUserList')[0].scrollHeight);
+}
+
+function sendMessage() {
+    // store
+    var message = $('#new_message').val();
+    // don't send empty messages
+    if(message === '') { return false; }
+
+    // clear new message box
+    $('#new_message').val('');
+    // socket.emit('send_message', { message: message });
+}
+</script>
