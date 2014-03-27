@@ -39,6 +39,7 @@ app.configure(function() {
     app.use(partials());
     app.use(app.router);
     app.use(express.static(path.join(__dirname, 'public')));
+    app.use(redirectUnmatched);
 });
 
 // development only
@@ -46,11 +47,15 @@ if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
 
+// Catches all unmatched urls and redirects them to the home page
+function redirectUnmatched(req, res) {
+  res.redirect("/");
+}
+
 app.get('/', routes.index);
 app.get('/ready', room.waiting);
 app.get('/play/:hash', room.play);
 app.get('/emailPassword', routes_user.emailpassword);
-app.get('/newuser', routes_user.newuser);
 app.get('/profile', routes_user.profile);
 app.get('/changePassword', routes_user.changePassword);
 app.get('/changeEmail', routes_user.changeEmail);
