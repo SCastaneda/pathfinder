@@ -149,11 +149,22 @@ function go_home(data) {
 }
 
 function log_turn(to, from, player, valid, won) {
-    if (valid) {
-        $("#log").append(player + " moved from: " + from + " to: " + to + "<br>");
+    var move_message;
+
+    if (to-from < -1) {
+        move_message = "up";
+    } else if (to-from >1) {
+        move_message = "down";
+    } else if (to-from <0) {
+        move_message = "left";
     } else {
-        $("#log").append(player+" tried to move from: " + from + " to: " +
-            to + ", but FAILED HORRIBLY.<br>");
+        move_message = "right"
+    }
+
+    if (valid) {
+        $("#log").append(player + " moved " + move_message + ".<br>");
+    } else {
+        $("#log").append(player+" tried to move " + move_message + ", but FAILED HORRIBLY.<br>");
     }
 
     $('#log').scrollTop($('#log')[0].scrollHeight);
