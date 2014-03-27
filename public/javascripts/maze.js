@@ -17,11 +17,11 @@ function generate_board(dim) {
     maze = new Maze(dim);
     make_edge_Map(dim);
 
-    create_board_html("#board", dim, false);
+    create_board_html("#board", dim, false, 0);
 }
 
 // generates the html for a board
-function create_board_html(divID, dim, emptyBoard) {
+function create_board_html(divID, dim, emptyBoard, start_square) {
     $(divID).empty();
     var current_wall = 0;
     var current_square = 0;
@@ -29,6 +29,8 @@ function create_board_html(divID, dim, emptyBoard) {
     var wall_id_prefix = (emptyBoard)? "w": "";
     maze_size = dim;
     var i;
+
+    // if (!start_square) start_square = 0;
 
     for(i = 0; i < dim; i++) {
         var j, wall, square;
@@ -52,42 +54,26 @@ function create_board_html(divID, dim, emptyBoard) {
         // This is the div to hold the row of walls and squares
         var wall_square = $("<div>", {class: "row row-squares"});
 
-        for (j = 0; j < dim; j++) {
-            if (j === 0 && i === 0) {
-                // The very first square defaults to start
-                square = $("<div>", {class: "square start", id: id_prefix+current_square}).click(toggle);
-                $(wall_square).append($("<div>", {class: "wall wall-vertical red"}), square);
-
-            } else if (j === 0 && emptyBoard) {
-                square = $("<div>", {class: "square", id: id_prefix+current_square}).click(toggle);
-                $(wall_square).append($("<div>", {class: "wall wall-vertical red"}), square);
-
-            } else if (emptyBoard) {
-                wall = $("<div>", {class: "wall wall-vertical", id: wall_id_prefix+current_wall}).click(toggle);
-                square = $("<div>", {class: "square", id: id_prefix+current_square}).click(toggle);
-                $(wall_square).append(wall, square);
-                current_wall++;
-            } else if (j === 0) {
-                // Otherwise just make sure the far left wall is red
-                square = $("<div>", {class: "square", id: id_prefix+current_square}).click(toggle);
-                $(wall_square).append($("<div>", {class: "wall wall-vertical red"}), square);
-
-            } else if (j === dim - 1 && i === dim - 1 && !emptyBoard) {
-                // The very last square defaults to exit
-                wall = $("<div>", {class: "wall wall-vertical", id: wall_id_prefix+current_wall}).click(toggle);
-                square = $("<div>", {class: "square end", id: id_prefix+current_square}).click(toggle);
-                $(wall_square).append(wall, square);
-                current_wall++;
-
+        for (j = 0; j <dim; j++) {
+            // Determine the wall properties
+            if (j === 0) {
+                $(wall_square).append($("<div>", {class: "wall wall-vertical red"}));
             } else {
-                // Otherwise walls need to be grey, assigned an ID, and get the fucntion attached if they are clicked
-                wall = $("<div>", {class: "wall wall-vertical", id: wall_id_prefix+current_wall}).click(toggle);
-                square = $("<div>", {class: "square", id: id_prefix+current_square}).click(toggle);
-                $(wall_square).append(wall, square);
+                $(wall_square).append($("<div>", {class: "wall wall-vertical", id: wall_id_prefix+current_wall}).click(toggle));
                 current_wall++;
+            }
+
+            // Determine the square properties
+            if (current_square === start_square) {
+                $(wall_square).append($("<div>", {class: "square start", id: id_prefix+current_square}).click(toggle));
+            } else if (j === dim - 1 && i === dim - 1 && !emptyBoard) {
+                $(wall_square).append($("<div>", {class: "square end", id: id_prefix+current_square}).click(toggle));
+            } else {
+                $(wall_square).append($("<div>", {class: "square", id: id_prefix+current_square}).click(toggle));
             }
             current_square++;
         }
+        
         // final wall, it's perma red and non-clickable
         $(wall_square).append($("<div>", {class: "wall wall-vertical red"}));
 
@@ -133,10 +119,10 @@ function toggle(event) {
         }
 
         if ($(target).hasClass("start")) {
-            // $(target).removeClass("start");
-            // start = false;
+            $(target).removeClass("start");
+            start = false;
 
-            // maze.removeStart();
+            maze.removeStart();
 
         } else if ($(target).hasClass("end")) {
             $(target).removeClass("end");
@@ -145,10 +131,10 @@ function toggle(event) {
             maze.removeEnd();
 
         } else if (!start) {
-            // $(target).addClass("start");
-            // start = true;
+            $(target).addClass("start");
+            start = true;
 
-            // maze.addStart(index);
+            maze.addStart(index);
 
         } else if (!end) {
             $(target).addClass("end");

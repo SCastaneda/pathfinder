@@ -77,20 +77,20 @@
     });
 
     socket.on('start_play_phase', function(data) {
-    $('#announcements').html("Play phase started!");
+    $('#announcements').remove();
 
     disable_board_modify = true;
 
     //
     // ***FIX ME***
     //
-    from_square = 0;
-    start = 0;
+    from_square = data.start;
+    start = data.start;
     $("#o"+from_square).removeClass("start").addClass("current");
 
     // Creates a new board element, this will be what the user uses
     // to see their progress and make their next move
-    create_board_html("#opp_board", dim, true);
+    create_board_html("#opp_board", dim, true, start);
 
     $('#ready_btn').remove();
     $('#board_row').append($("<button>", {id: "submit", text:"Submit"}).wrap("<td></td>").click(function() {

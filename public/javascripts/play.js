@@ -130,7 +130,6 @@ socket.on('your_turn', function(data) {
 // comes back when a player wins, get's checked after every move
 socket.on('game_over', function(data) {
     current_turn = false;
-    alert(data.winner + " wins! " + data.loser + ' is a LOSER!');
     showModal('Game over!', data.winner + " wins! " + data.loser +
         " just needs to realise that winning isn't everything. You'll get 'em next time tiger!");
 });
