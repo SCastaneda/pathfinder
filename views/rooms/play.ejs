@@ -19,7 +19,7 @@
 
     <div class='row'>
         <div class='col-xs-4 col-xs-4'>
-            <div class="well" id="chat"></div><br>
+            <div class="well" id="chat" style="width: 350px; height: 75px; margin-top: 30px;"></div><br>
             <input type="text" id="new_message" onkeydown="if (event.keyCode == 13) sendMessage();">
             <button onclick="sendMessage()">send</button>
         </div>
@@ -53,6 +53,7 @@
 <script src='/javascripts/maze.js'></script>
 <script src="/socket.io/socket.io.js"></script>
 <script src='/javascripts/play.js'></script>
+<script src='/javascripts/chat.js'></script>
 <script type="text/javascript">
     function toggle_ready_button(state) {
         if(state) {
