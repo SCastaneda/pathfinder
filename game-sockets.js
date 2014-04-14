@@ -218,7 +218,6 @@ exports.start = function(io, cookieParser, sessionStore) {
             return socket.emit('disconnect', {});
         }
 
-
         if(room == 'waiting') {
             // joins user to the waiting room, and dispatches 2 users to a game
             join_waiting(socket, user);
@@ -243,7 +242,6 @@ exports.start = function(io, cookieParser, sessionStore) {
             if(user) {
                 console.log(user.name + " disconnected from room: " + user.room);
                 
-
                 if(user.room === 'waiting') {
                     io.sockets.in('waiting').emit('update_total', { count: all_users_waiting.length });
                 } else if(user.room === 'lobby') {
