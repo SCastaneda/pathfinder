@@ -9,6 +9,7 @@ var maze_size = 5;
 
 var sanitize = require('validator').sanitize;
 db_room      = require('./db/rooms');
+db_user      = require('./db/user');
 
 exports.start = function(io, cookieParser, sessionStore) {
 
@@ -82,6 +83,18 @@ exports.start = function(io, cookieParser, sessionStore) {
                         });
                         get_user_by_name(loser, function(player) {
                             player.socket.emit('game_over', { winner: winner, loser: loser });
+                        });
+
+                        db_user.inc_wins(winner, function(success) {
+                            if(!success) {
+                                console.error("Could not update wins for: " + winner);
+                            }
+                        });
+
+                        db_user.inc_losses(loser, function(success) {
+                            if(!success) {
+                                console.error("Could not update losses for: " + loser);
+                            }
                         });
 
                     // if the game is not over, let the next player know it's his turn
@@ -217,6 +230,7 @@ exports.start = function(io, cookieParser, sessionStore) {
             all_users_playing.push(user);
             console.log("ALL USERS PLAYING:\n");
             console.log(all_users_playing);
+            io.sockets.in(room).emit('broadcast_message', {by: "Server", message: user.name + " connected"});
 
 
             // once we have both players in the room, we start the create maze phase
@@ -227,16 +241,30 @@ exports.start = function(io, cookieParser, sessionStore) {
     function disconnect(socket) {
         get_user(socket, function(user) {
             if(user) {
-                console.log(user.name + " disconnected");
+                console.log(user.name + " disconnected from room: " + user.room);
+                
+
+                if(user.room === 'waiting') {
+                    io.sockets.in('waiting').emit('update_total', { count: all_users_waiting.length });
+                } else if(user.room === 'lobby') {
+                    update_lobby_users();
+                }
+
+                delete_user(user.name, function(deleted) {
+                    if(deleted) {
+                        io.sockets.in(user.room).emit('broadcast_message', {by: "Server", message: user.name+ " disconnected"});
+                    } else {
+                        console.log("can't update total: " + all_users_waiting);
+                    }
+                });
             }
         });
 
-        delete_user(socket, function(deleted) {
-            if(deleted) {
-                io.sockets.in('waiting').emit('update_total', { count: all_users_waiting.length });
-            } else {
-                console.log("can't update total: " + all_users_waiting);
-            }
+    }
+
+    function update_lobby_users() {
+        get_users_by_room("lobby", function(users) {
+            io.sockets.in("lobby").emit("update_user_list", {users: users});
         });
     }
 
@@ -288,29 +316,27 @@ exports.start = function(io, cookieParser, sessionStore) {
         });
     }
 
-    function delete_user(socket, cb) {
+    function delete_user(username, cb) {
 
-        sessionSockets.getSession(socket, function(err, session) {
-            // find and remove user from all users list
-            for(var i = 0; i < all_users_waiting.length; i++) {
-                if(all_users_waiting[i].name == session.name) {
-                    all_users_waiting.splice(i, 1);
-                    return cb(true);
-                }
-
+        // find and remove user from all users list
+        for(var i = 0; i < all_users_waiting.length; i++) {
+            if(all_users_waiting[i].name == username) {
+                all_users_waiting.splice(i, 1);
+                return cb(true);
             }
 
-            for(var i = 0; i < all_users_playing.length; i++) {
-                if(all_users_playing[i].name == session.name) {
-                    all_users_playing.splice(i, 1);
-                    return cb(true);
-                }
+        }
 
+        for(var i = 0; i < all_users_playing.length; i++) {
+            if(all_users_playing[i].name == username) {
+                all_users_playing.splice(i, 1);
+                return cb(true);
             }
-            console.log(session.name + ": " + all_users_waiting);
-            console.log(session.name + ": " + all_users_playing);
-            return cb(false);
-        });
+
+        }
+        
+        return cb(false);
+        
     }
 
     // add user to waiting room

@@ -2,24 +2,24 @@
 /**
  * Module dependencies.
  */
-var connect  = require('connect');
-var http     = require('http');
-var path     = require('path');
+var connect      = require('connect');
+var http         = require('http');
+var path         = require('path');
 
-var express  = require('express');
-var partials = require('express-partials');
+var express      = require('express');
+var partials     = require('express-partials');
 
-var routes   = require('./routes');
-var routes_user = require('./routes/user');
+var routes       = require('./routes');
+var routes_user  = require('./routes/user');
 
-var room     = require('./routes/room');
+var room         = require('./routes/room');
 var game_sockets = require('./game-sockets');
 
-var db       = require('./db/user');
+var db           = require('./db/user');
 
-var nodemailer = require("nodemailer");
-var crypto   = require('crypto');
-var app = express();
+var nodemailer   = require("nodemailer");
+var crypto       = require('crypto');
+var app          = express();
 
 var cookieParser = express.cookieParser('JAHAUSnajksdjKAHSD819238127389');
 var sessionStore = new connect.middleware.session.MemoryStore();
