@@ -60,12 +60,14 @@ exports.emailpassword = function(req, res){
 exports.profile = function(req, res){
 	
 	if(req.session.name){
-		if(req.session.infoMessage){
-			res.render('profile', {session: req.session, name: req.session.name, wins: req.session.wins, losses: req.session.losses, infoMessage: req.session.infoMessage});
-		}
-		else{
-			res.render('profile', {session: req.session, name: req.session.name, wins: req.session.wins, losses: req.session.losses, infoMessage: ""});
-		}
+		db_user.get_user(req.session.name, function(username, pass, salt, mail, wins, losses){
+			if(req.session.infoMessage){
+				res.render('profile', {session: req.session, name: req.session.name, wins: wins, losses: losses, infoMessage: req.session.infoMessage});
+			}
+			else{
+				res.render('profile', {session: req.session, name: req.session.name, wins: wins, losses: losses, infoMessage: ""});
+			}
+		});
 	}
 	else{
 		res.redirect('/');
