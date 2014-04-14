@@ -21,6 +21,7 @@ exports.login = function(req, res){
 		if(hash == pass){
 
 			req.session.name = name;
+			req.session.loggedin = true;
 			req.session.wins = wins;
 			req.session.losses = losses;
 
@@ -334,3 +335,11 @@ exports.changeMail = function(req, res){
 	});
 	}
 };
+
+exports.logout = function(req, res){
+
+	req.session.name = "";
+	req.session.loggedin = "";
+	res.redirect('/');
+
+}

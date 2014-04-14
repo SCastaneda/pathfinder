@@ -70,7 +70,6 @@ a {
 
 .current {
     background-color: White;
-    !important;
 }
 
 .start {
@@ -79,6 +78,14 @@ a {
 
 .end {
     background-color: Gold;
+}
+
+.selected.start {
+    background-color: Black;
+}
+
+.start.current {
+  background-color: White;
 }
 
 #chat {
