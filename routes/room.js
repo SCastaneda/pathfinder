@@ -9,7 +9,7 @@ exports.waiting = function(req, res){
 
     if(req.session.name) {
         // serves the page in 'view/rooms/waiting.ejs' 
-        res.render('rooms/waiting', { name: req.session.name });
+        res.render('rooms/waiting', { session: req.session, name: req.session.name });
     } else {
         res.redirect('/');
     }
@@ -25,7 +25,7 @@ exports.play = function(req, res) {
         if (status === true) {
             // serves the page in 'view/rooms/play.ejs'
             console.log(req.session.name + " allowed in room " + hash + ": " + message);
-            res.render('rooms/play', {name: req.session.name, room: hash });
+            res.render('rooms/play', {session: req.session, name: req.session.name, room: hash });
         } else {
             res.redirect('/ready');
         }
@@ -35,7 +35,7 @@ exports.play = function(req, res) {
 exports.lobby = function(req, res) {
     if(req.session.name) {
         //
-        res.render('rooms/lobby', {name: req.session.name});
+        res.render('rooms/lobby', {session: req.session, name: req.session.name});
     } else {
         res.redirect('/');
     }

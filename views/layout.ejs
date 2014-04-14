@@ -38,18 +38,25 @@
                     <ul class="nav navbar-nav">
                     <li class="active"><a href="/">Home</a></li>
                     <li><a href="#about">How to Play</a></li>
+                    <% if(!session.loggedin) { %>
                     <li><a data-toggle="modal" data-target="#regModal">Register</a></li>
+                    <% } %>
                     </ul>
-
-                    <form class="navbar-form navbar-right" action="/login" method="post" role="form">
-                        <div class="form-group">
-                              <input type="text" name="name" placeholder="Username" class="form-control">
-                        </div>
-                        <div class="form-group">
-                              <input type="password" name="password" placeholder="Password" class="form-control">
-                        </div>
-                        <button type="submit" class="btn btn-success">Sign in</button>
-                      </form>
+                    <% if(session.loggedin) { %>
+                        <form class="navbar-form navbar-right" action="/logout" method="get" role="form">
+                        <button class="btn btn-success">Logout</button>
+                        </form>
+                    <% } else { %>
+                        <form class="navbar-form navbar-right" action="/login" method="post" role="form">
+                            <div class="form-group">
+                                  <input type="text" name="name" placeholder="Username" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                  <input type="password" name="password" placeholder="Password" class="form-control">
+                            </div>
+                            <button type="submit" class="btn btn-success">Sign in</button>
+                        </form>
+                    <% } %>
                 </div><!--/.nav-collapse -->
             </div>
         </div>

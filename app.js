@@ -71,12 +71,6 @@ app.post('/newuser', routes_user.createUser);
 //post for forgot password page
 app.post('/emailpassword', routes_user.getPassword);
 
-app.post('/findgame', function(req, res){
-
-	console.log("testing profile post");
-	res.redirect('/ready');
-
-});
 
 app.post('/changePassword', routes_user.changepw);
 app.post('/changeEmail', routes_user.changeMail);

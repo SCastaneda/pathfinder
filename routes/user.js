@@ -50,10 +50,10 @@ exports.login = function(req, res){
 exports.emailpassword = function(req, res){
 
 	if(req.session.errorMessage){
-		res.render('emailpassword', {errorMessage: req.session.errorMessage});
+		res.render('emailpassword', {session: req.session, errorMessage: req.session.errorMessage});
 	}
 	else{
-		res.render('emailpassword', {errorMessage: ''});
+		res.render('emailpassword', {session: req.session, errorMessage: ''});
 	}
 	req.session.errorMessage = "";
 };
@@ -61,10 +61,10 @@ exports.profile = function(req, res){
 	
 	if(req.session.name){
 		if(req.session.infoMessage){
-			res.render('profile', {name: req.session.name, wins: req.session.wins, losses: req.session.losses, infoMessage: req.session.infoMessage});
+			res.render('profile', {session: req.session, name: req.session.name, wins: req.session.wins, losses: req.session.losses, infoMessage: req.session.infoMessage});
 		}
 		else{
-			res.render('profile', {name: req.session.name, wins: req.session.wins, losses: req.session.losses, infoMessage: ""});
+			res.render('profile', {session: req.session, name: req.session.name, wins: req.session.wins, losses: req.session.losses, infoMessage: ""});
 		}
 	}
 	else{
@@ -76,10 +76,10 @@ exports.changePassword = function(req, res){
 	
 	if(req.session.name){
 		if(req.session.errorMessage){
-			res.render('changePassword', {errorMessage: req.session.errorMessage});
+			res.render('changePassword', {session: req.session, errorMessage: req.session.errorMessage});
 		}
 		else{
-			res.render('changePassword', {errorMessage: ""});
+			res.render('changePassword', {session: req.session, errorMessage: ""});
 		}
 	}
 	else{
@@ -92,10 +92,10 @@ exports.changeEmail = function(req, res){
 	
 	if(req.session.name){
 		if(req.session.errorMessage){
-			res.render('changeEmail', {errorMessage: req.session.errorMessage});
+			res.render('changeEmail', {session: req.session, errorMessage: req.session.errorMessage});
 		}
 		else{
-			res.render('changeEmail', {errorMessage: ""});
+			res.render('changeEmail', {session: req.session, errorMessage: ""});
 		}
 	}
 	else{
