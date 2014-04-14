@@ -28,19 +28,27 @@ $(document).ready(function() {
     socket.emit('join_room', {room: 'lobby'});
 });
 
-for (var i=0; i<20; i++) {
-	// var user = "User"+i+"<br>";
-	var user = $("<button>", {class:"btn btn-default challenge", type:"button"})
-				.attr("data-container", "body")
-				.attr("data-toggle", "popover")
-				.attr("data-placement", "left")
-				.attr("data-content", "Challenge User")
-				.append("User"+i);
+socket.on('update_user_list', update_user_list);
 
-	$('#lobbyUserList').append(user);
-    $('#lobbyUserList').scrollTop($('#lobbyUserList')[0].scrollHeight);
+function update_user_list(data) {
+    console.log(data);
+    $('#lobbyUserList').html(" ");
+
+    for (var i=0; i < data.users.length; i++) {
+    	// var user = "User"+i+"<br>";
+    	var user = $("<button>", {class:"btn btn-default challenge", type:"button"})
+    				.attr("data-container", "body")
+    				.attr("data-toggle", "popover")
+    				.attr("data-placement", "left")
+    				.attr("data-content", "Challenge " + data.users[i])
+    				.append(data.users[i]);
+
+    	$('#lobbyUserList').append(user);
+        $('#lobbyUserList').scrollTop($('#lobbyUserList')[0].scrollHeight);
+    }
+    $('.challenge').popover();
 }
-$('.challenge').popover();
+
 
 </script>
 <script src='/javascripts/chat.js'></script>

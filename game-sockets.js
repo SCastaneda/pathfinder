@@ -22,7 +22,7 @@ exports.start = function(io, cookieParser, sessionStore) {
 
     function connect(err, socket, session) {
         // if the user didn't log in, send him to the login page
-        if(session.name) {
+        if(session && session.name) {
             var user = new User(socket, session.name);
         } else {
             socket.emit('disconnect', {});
@@ -218,9 +218,16 @@ exports.start = function(io, cookieParser, sessionStore) {
             return socket.emit('disconnect', {});
         }
 
-        if(room == 'waiting') {
+        if(room === 'waiting') {
             // joins user to the waiting room, and dispatches 2 users to a game
             join_waiting(socket, user);
+        } else if(room === "lobby") {
+            socket.join(room);
+            user.room = room;
+
+            all_users_playing.push(user);
+            update_lobby_users();
+            io.sockets.in(room).emit('broadcast_message', { by: "Server", message: user.name + " connected" });
         } else {
             // validate that room exists
             // validate that user is allowed to join room
@@ -231,10 +238,11 @@ exports.start = function(io, cookieParser, sessionStore) {
             console.log(all_users_playing);
             io.sockets.in(room).emit('broadcast_message', {by: "Server", message: user.name + " connected"});
 
-
             // once we have both players in the room, we start the create maze phase
             socket.emit('start_create_maze_phase', { maze_dim: maze_size });
         }
+
+        
     }
 
     function disconnect(socket) {
@@ -262,7 +270,11 @@ exports.start = function(io, cookieParser, sessionStore) {
 
     function update_lobby_users() {
         get_users_by_room("lobby", function(users) {
-            io.sockets.in("lobby").emit("update_user_list", {users: users});
+            var usernames = [];
+            for(var i = 0; i < users.length; i++) {
+                usernames.push(users[i].name);
+            }
+            io.sockets.in("lobby").emit("update_user_list", {users: usernames});
         });
     }
 
