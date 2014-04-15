@@ -261,8 +261,6 @@ exports.start = function(io, cookieParser, sessionStore) {
                         if(user.room === "lobby") {
                             update_lobby_users();
                         }
-                    } else {
-                        console.log("can't update total: " + all_users_waiting);
                     }
                 });
             }
@@ -318,8 +316,8 @@ exports.start = function(io, cookieParser, sessionStore) {
             }
         }
 
-        for(var i = 0; i < all_users_playing.length; i++) {
-            if(name == all_users_playing[i].name) {
+        for(var i = 0; i < all_users_lobby.length; i++) {
+            if(name == all_users_lobby[i].name) {
                 return cb(all_users_lobby[i]);
             }
         }
