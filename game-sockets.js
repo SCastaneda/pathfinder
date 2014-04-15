@@ -5,6 +5,7 @@ function User(socket, name) {
 }
 var all_users_waiting = [];
 var all_users_playing = [];
+var all_users_lobby   = [];
 var maze_size = 5;
 
 var sanitize = require('validator').sanitize;
@@ -225,7 +226,7 @@ exports.start = function(io, cookieParser, sessionStore) {
             socket.join(room);
             user.room = room;
 
-            all_users_playing.push(user);
+            all_users_lobby.push(user);
             update_lobby_users();
             io.sockets.in(room).emit('broadcast_message', { by: "Server", message: user.name + " connected" });
         } else {
@@ -281,11 +282,26 @@ exports.start = function(io, cookieParser, sessionStore) {
 
     function get_users_by_room(room, cb) {
         var players = [];
-        for(var i = 0; i < all_users_playing.length; i++) {
-            if(room == all_users_playing[i].room) {
-                players.push(all_users_playing[i]);
+        if(room !== 'waiting' && room !== 'lobby') {
+            for(var i = 0; i < all_users_playing.length; i++) {
+                if(room == all_users_playing[i].room) {
+                    players.push(all_users_playing[i]);
+                }
+            }
+        } else if(room === 'lobby') {
+            for(var i = 0; i < all_users_lobby.length; i++) {
+                if(room == all_users_lobby[i].room) {
+                    players.push(all_users_lobby[i]);
+                }
+            }
+        } else if(room === 'waiting') {
+            for(var i = 0; i < all_users_waiting.length; i++) {
+                if(room == all_users_waiting[i].room) {
+                    players.push(all_users_waiting[i]);
+                }
             }
         }
+
         return cb(players);
     }
 
@@ -299,6 +315,12 @@ exports.start = function(io, cookieParser, sessionStore) {
         for(var i = 0; i < all_users_playing.length; i++) {
             if(name == all_users_playing[i].name) {
                 return cb(all_users_playing[i]);
+            }
+        }
+
+        for(var i = 0; i < all_users_playing.length; i++) {
+            if(name == all_users_playing[i].name) {
+                return cb(all_users_lobby[i]);
             }
         }
         return cb(false);
@@ -322,8 +344,16 @@ exports.start = function(io, cookieParser, sessionStore) {
                     }
 
                 }
+
+                for(var i = 0; i < all_users_lobby.length; i++) {
+                    if(all_users_lobby[i].name == session.name) {
+                        return cb(all_users_lobby[i]);
+                    }
+
+                }
                 console.log(session.name + ": " + all_users_waiting);
                 console.log(session.name + ": " + all_users_playing);
+                console.log(session.name + ": " + all_users_lobby);
             }
             return cb(false);
         });
@@ -343,6 +373,14 @@ exports.start = function(io, cookieParser, sessionStore) {
         for(var i = 0; i < all_users_playing.length; i++) {
             if(all_users_playing[i].name == username) {
                 all_users_playing.splice(i, 1);
+                return cb(true);
+            }
+
+        }
+
+        for(var i = 0; i < all_users_lobby.length; i++) {
+            if(all_users_lobby[i].name == username) {
+                all_users_lobby.splice(i, 1);
                 return cb(true);
             }
 
