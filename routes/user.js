@@ -315,33 +315,31 @@ exports.changeMail = function(req, res){
 	else{
 	db.check_email(email, function(email_exists){
 	
-	if(!email_exists){
+		if(!email_exists){
 
-	db.changeEmail(email, req.session.name, function(updated){
-		if(updated){
-					
-			req.session.infoMessage = "Your email has been changed";
-			res.redirect('/profile');
+			db.changeEmail(email, req.session.name, function(updated){
+				if(updated){
+							
+					req.session.infoMessage = "Your email has been changed";
+					res.redirect('/profile');
+				}
+				else{
+					console.log("error, info was not entered into database");
+					res.redirect('/profile');
+				}
+			});
+		} else {
+			req.session.errorMessage = "Email already exists";
+			console.log('email already exists');
+			res.redirect('/changeEmail');
 		}
-		else{
-			console.log("error, info was not entered into database");
-			res.redirect('/profile');
-		}
-	});
-	}
-	else{
-		req.session.errorMessage = "Email already exists";
-		console.log('email already exists');
-		res.redirect('/changeEmail');
-	}
 	});
 	}
 };
 
 exports.logout = function(req, res){
 
-	req.session.name = "";
-	req.session.loggedin = "";
+	req.session.loggedin = false;
 	res.redirect('/');
 
 }

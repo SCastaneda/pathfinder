@@ -14,8 +14,7 @@ exports.index = function(req, res){
       	} else {	
       		res.render('index', { session: req.session, title: 'Pathfinder' , errorMessage: '', infoMessage: ''});
     	}
-      	req.session.name = "";
-    	req.session.errorMessage = "";
+    	  req.session.errorMessage = "";
       	req.session.infoMessage = "";
 	}
 }

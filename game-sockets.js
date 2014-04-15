@@ -252,13 +252,14 @@ exports.start = function(io, cookieParser, sessionStore) {
                 
                 if(user.room === 'waiting') {
                     io.sockets.in('waiting').emit('update_total', { count: all_users_waiting.length });
-                } else if(user.room === 'lobby') {
-                    update_lobby_users();
                 }
 
                 delete_user(user.name, function(deleted) {
                     if(deleted) {
                         io.sockets.in(user.room).emit('broadcast_message', {by: "Server", message: user.name+ " disconnected"});
+                        if(user.room === "lobby") {
+                            update_lobby_users();
+                        }
                     } else {
                         console.log("can't update total: " + all_users_waiting);
                     }
@@ -307,21 +308,23 @@ exports.start = function(io, cookieParser, sessionStore) {
     function get_user(socket, cb) {
 
         sessionSockets.getSession(socket, function(err, session) {
-            for(var i = 0; i < all_users_waiting.length; i++) {
-                if(all_users_waiting[i].name == session.name) {
-                    return cb(all_users_waiting[i]);
+            if(typeof session !== 'undefined') {
+                for(var i = 0; i < all_users_waiting.length; i++) {
+                    if(all_users_waiting[i].name == session.name) {
+                        return cb(all_users_waiting[i]);
+                    }
+
                 }
 
-            }
+                for(var i = 0; i < all_users_playing.length; i++) {
+                    if(all_users_playing[i].name == session.name) {
+                        return cb(all_users_playing[i]);
+                    }
 
-            for(var i = 0; i < all_users_playing.length; i++) {
-                if(all_users_playing[i].name == session.name) {
-                    return cb(all_users_playing[i]);
                 }
-
+                console.log(session.name + ": " + all_users_waiting);
+                console.log(session.name + ": " + all_users_playing);
             }
-            console.log(session.name + ": " + all_users_waiting);
-            console.log(session.name + ": " + all_users_playing);
             return cb(false);
         });
     }
