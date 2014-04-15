@@ -55,6 +55,10 @@
 <script src='/javascripts/play.js'></script>
 <script src='/javascripts/chat.js'></script>
 <script type="text/javascript">
+    $(document).ready(function() {
+        socket.emit('join_room', {room: '<%= room %>'});
+    });
+
     function toggle_ready_button(state) {
         if(state) {
             $('#ready_btn').removeAttr('disabled');
@@ -75,6 +79,8 @@
                 end: maze.getEndId()
             }
         );
+
+        toggle_ready_button(false);
     });
 
     socket.on('start_play_phase', function(data) {

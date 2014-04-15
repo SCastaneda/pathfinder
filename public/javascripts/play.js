@@ -1,8 +1,6 @@
 var dim, start, room;
 var socket = io.connect("");
 
-socket.emit('join_room', {room: '<%= room %>'});
-
 socket.on('disconnect', go_home);
 socket.on('start_create_maze_phase', function(data) {
 

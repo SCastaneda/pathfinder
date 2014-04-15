@@ -218,6 +218,7 @@ exports.start = function(io, cookieParser, sessionStore) {
         if(!session.name) {
             return socket.emit('disconnect', {});
         }
+        console.log("joined room:" + room);
 
         if(room === 'waiting') {
             // joins user to the waiting room, and dispatches 2 users to a game
