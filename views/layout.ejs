@@ -65,7 +65,14 @@
         <div class="notification">
             <div class="alert fade in bg-danger" id="login-error" hidden>
                 <button type="button" class="close">×</button>
-                <div id="notification-body"><% if(session.errorMessage !== ""){%><%=session.errorMessage%><%}%></div>
+                <div id="notification-body"><% if(typeof session !== "undefined" && typeof session.errorMessage !== "undefined" && session.errorMessage !== ""){%><%=session.errorMessage%><%}%></div>
+            </div>
+        </div>
+
+        <div class="notification">
+            <div class="alert fade in bg-success" id="login-info" hidden>
+                <button type="button" class="close">×</button>
+                <div id="info-body"><% if(typeof session !== "undefined" && typeof session.infoMessage !== "undefined" && session.infoMessage !== ""){%><%=session.infoMessage%><%}%></div>
             </div>
         </div>
 
@@ -130,7 +137,9 @@
     $(document).ready(function(){
         if (!$("#notification-body").is(':empty')) {
             $("#login-error").show();
-        } else {
+        }
+        if (!$("#info-body").is(':empty')) {
+            $("#login-info").show();
         }
     });
 

@@ -110,7 +110,7 @@ a {
 
 .notification {
   position: fixed;
-  top: 25px;
+  top: 46px;
   right: 10px;
   z-index: 9999;
 }
