@@ -107,3 +107,16 @@ a {
   height: 500px;
   overflow: scroll;
 }
+
+.notification {
+  position: fixed;
+  top: 25px;
+  right: 10px;
+  z-index: 9999;
+}
+
+.notification > div {
+  position: relative;
+  z-index: 9999;
+  margin: 5px 0px;
+}
