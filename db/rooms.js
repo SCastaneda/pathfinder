@@ -281,7 +281,7 @@ exports.check_for_win = function(hash, cb) {
                 {winner: room.player2, loser: room.player1, current_phase: 2}, 
                 function(err, numAffected, raw) {
                     if(err) { console.error(err); }
-                    return cb(true, room.player2, room.player1);
+                    return cb(true, room.player2, room.player1, room.player2_board.end);
                 }
             );
 
@@ -292,7 +292,7 @@ exports.check_for_win = function(hash, cb) {
                 {winner: room.player1, loser: room.player2, current_phase: 2}, 
                 function(err, numAffected, raw) {
                     if(err) { console.error(err); }
-                    return cb(true, room.player1, room.player2);
+                    return cb(true, room.player1, room.player2, room.player1_board.end);
                 }
             );
         } else {

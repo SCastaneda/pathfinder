@@ -75,15 +75,15 @@ exports.start = function(io, cookieParser, sessionStore) {
                 }
 
                 // check for a winner, every time a move is made.
-                db_room.check_for_win(data.room, function(game_over, winner, loser) {
+                db_room.check_for_win(data.room, function(game_over, winner, loser, end_pos) {
 
                     // if the game is over, let both players know
                     if(game_over) {
                         get_user_by_name(winner, function(player) {
-                            player.socket.emit('game_over', { winner: winner, loser: loser });
+                            player.socket.emit('game_over', { winner: winner, loser: loser, end: undefined });
                         });
                         get_user_by_name(loser, function(player) {
-                            player.socket.emit('game_over', { winner: winner, loser: loser });
+                            player.socket.emit('game_over', { winner: winner, loser: loser, end: end_pos});
                         });
 
                         db_user.inc_wins(winner, function(success) {
