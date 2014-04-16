@@ -1,5 +1,4 @@
-<h1>Game Room</h1>
-
+<h1 id="vs"></h1>
 <div id='announcements'>Waiting on other player to join</div>
 
 <div class='container'>
@@ -85,6 +84,7 @@
 
     socket.on('start_play_phase', function(data) {
     $('#announcements').remove();
+    $('#vs').html("It's on! " + data.player1 + " vs " + data.player2);
 
     disable_board_modify = true;
 

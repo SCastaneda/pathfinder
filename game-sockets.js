@@ -159,7 +159,7 @@ exports.start = function(io, cookieParser, sessionStore) {
 
                         get_user_by_name(player1, function(player) {
 
-                            player.socket.emit('start_play_phase', {start: start2});
+                            player.socket.emit('start_play_phase', {start: start2, player1: player1, player2: player2});
 
                             // tell this player who's turn it is
                             db_room.get_next_player(data.room, function(next_player) {
@@ -173,7 +173,7 @@ exports.start = function(io, cookieParser, sessionStore) {
 
                         get_user_by_name(player2, function(player) {
 
-                            player.socket.emit('start_play_phase', {start: start1});
+                            player.socket.emit('start_play_phase', {start: start1, player1: player1, player2: player2});
 
                             // tell this user who's turn it is
                             db_room.get_next_player(data.room, function(next_player) {
