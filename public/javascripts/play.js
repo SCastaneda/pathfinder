@@ -106,6 +106,10 @@ socket.on('game_over', function(data) {
     current_turn = false;
     showModal('Game over!', data.winner + " wins! " + data.loser +
         " just needs to realise that winning isn't everything. You'll get 'em next time tiger!");
+
+    if (data.end) {
+        $("#o"+data.end).addClass('end');
+    }
 });
 
 // server side maze-validation response
