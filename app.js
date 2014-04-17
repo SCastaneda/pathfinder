@@ -9,7 +9,7 @@ var path         = require('path');
 var express      = require('express');
 var partials     = require('express-partials');
 
-var routes       = require('./routes');
+var routes_index = require('./routes/index');
 var routes_user  = require('./routes/user');
 
 var room         = require('./routes/room');
@@ -52,28 +52,29 @@ function redirectUnmatched(req, res) {
   res.redirect("/");
 }
 
-app.get('/', routes.index);
-app.get('/ready', room.waiting);
-app.get('/play/:hash', room.play);
-app.get('/emailPassword', routes_user.emailpassword);
-app.get('/profile', routes_user.profile);
-app.get('/changePassword', routes_user.changePassword);
-app.get('/changeEmail', routes_user.changeEmail);
-app.get('/lobby', room.lobby);
-app.get('/logout', routes_user.logout);
+app.get('/'               , routes_index.index);
+app.get('/howto'          , routes_index.howto);
+app.get('/ready'          , room.waiting);
+app.get('/play/:hash'     , room.play);
+app.get('/emailPassword'  , routes_user.emailpassword);
+app.get('/profile'        , routes_user.profile);
+app.get('/changePassword' , routes_user.changePassword);
+app.get('/changeEmail'    , routes_user.changeEmail);
+app.get('/lobby'          , room.lobby);
+app.get('/logout'         , routes_user.logout);
 
 
-app.post('/login', routes_user.login);
+app.post('/login'          , routes_user.login);
 
 //post for new user page
-app.post('/newuser', routes_user.createUser);
+app.post('/newuser'        , routes_user.createUser);
 
 //post for forgot password page
-app.post('/emailpassword', routes_user.getPassword);
+app.post('/emailpassword'  , routes_user.getPassword);
 
 
-app.post('/changePassword', routes_user.changepw);
-app.post('/changeEmail', routes_user.changeMail);
+app.post('/changePassword' , routes_user.changepw);
+app.post('/changeEmail'    , routes_user.changeMail);
 
 // the server variable will be necessary for socket.io
 var server = http.createServer(app).listen(app.get('port'), function(){
