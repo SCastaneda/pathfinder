@@ -29,6 +29,36 @@ $(document).ready(function() {
 });
 
 socket.on('update_user_list', update_user_list);
+socket.on('dispatch_to_game', join_game);
+
+
+// you are being challenged by another user
+socket.on('send_challenge', function(data) {
+    var challenger = data.challenger;
+    console.log("You are being challenged by: " + challenger);
+});
+
+function respond_to_challenge(name, response) {
+    socket.emit('respond_challenge', {response: response, challenger: name});
+}
+
+function challenge_user(name) {
+    socket.emit('request_challenge', { challengee: name });
+}
+
+socket.on('challenge_response', function(data) {
+    var response = data.status;
+    var message = data.message;
+    console.log("response to your challenge:" + response + " message: " + message);
+});
+
+
+function join_game(data) {
+    // redirect the user to their game room
+    window.location.replace("/play/" + data.hash);
+}
+
+
 
 function update_user_list(data) {
     console.log(data);

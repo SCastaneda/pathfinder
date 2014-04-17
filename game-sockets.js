@@ -50,7 +50,7 @@ exports.start = function(io, cookieParser, sessionStore) {
         socket.on('send_message', function(data) { broadcast_message(data, user); });
 
         socket.on('request_challenge', function(data) { send_challenge(data, user); });
-        socket.on('respond_challenge', function(data) { accept_challenge(data, user); });
+        socket.on('respond_challenge', function(data) { respond_challenge(data, user); });
 
     }
 
@@ -66,7 +66,7 @@ exports.start = function(io, cookieParser, sessionStore) {
                 if(users[i].name === user.name) {
                     found_challenger = true;
                     challenger = users[i];
-                } else if(users[i].name === data.to) {
+                } else if(users[i].name === data.challengee) {
                     found_challengee = true;
                     challengee = users[i];
                 }
@@ -82,7 +82,7 @@ exports.start = function(io, cookieParser, sessionStore) {
                     check_availability_challenges(challengee, function(available) {
                         if(available) {
                             challenges.push(new Challenge(challenger, challengee));
-                            challengee.socket.emit('send_challenge', { challenger: challenger });
+                            challengee.socket.emit('send_challenge', { challenger: challenger.name });
                         } else {
                             challenger.socket.emit('challenge_response', {status: false, message: "User has a pending challenge, try again later."})
                         }
@@ -115,30 +115,33 @@ exports.start = function(io, cookieParser, sessionStore) {
     }
 
     function respond_challenge(data, user) {
-        var challenger = data.challenger;
+        var challenger_name = data.challenger;
         var challengee = user;
 
         //verify challenge still exists
-        verify_challenge(challenger, challengee, function(status) {
-            if(status) {
-                // accepting challenge
-                if(data.response === true) {
-                    // dispatch
-                    db_room.create_room(challenger.name, challengee.name, function(hash) {
-                        challenger.socket.emit('challenge_response', {status: true, message: "Challenge accepted, dispatching you to game room."});
-                        challenger.socket.emit('dispatch_to_game', { hash: hash });
-                        challengee.socket.emit('dispatch_to_game', { hash: hash });
+        get_user_by_name(challenger_name, function(challenger) {
 
-                        console.log("FROM LOBBY! DISPATCHED " + challenger.name + " AND " + challengee.name + " to room " + hash);
-                    });
+            verify_challenge(challenger, challengee, function(status) {
+                if(status) {
+                    // accepting challenge
+                    if(data.response === true) {
+                        // dispatch
+                        db_room.create_room(challenger.name, challengee.name, function(hash) {
+                            challenger.socket.emit('challenge_response', {status: true, message: "Challenge accepted, dispatching you to game room."});
+                            challenger.socket.emit('dispatch_to_game', { hash: hash });
+                            challengee.socket.emit('dispatch_to_game', { hash: hash });
+
+                            console.log("FROM LOBBY! DISPATCHED " + challenger.name + " AND " + challengee.name + " to room " + hash);
+                        });
+                    } else {
+                        // declined
+                        challenger.socket.emit('challenge_response', { status: false, message: challengee.name + " declined your challenge" });
+                    }
+                    delete_challenge(challenger, challengee);
                 } else {
-                    // declined
-                    challenger.socket.emit('challenge_response', { status: false, message: challengee.name + " declined your challenge" });
+                    challengee.socket.emit('dispatch', { status: false, message: "Challenge no longer valid" });
                 }
-                delete_challenge(challenger, challenger);
-            } else {
-                challengee.socket.emit('dispatch', { status: false, message: "Challenge no longer valid" });
-            }
+            });
         });
 
     }
