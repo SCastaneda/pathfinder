@@ -1,29 +1,16 @@
-
-
-<script>
-function validateForm()
-{
-var email=document.forms["changeEmail"]["email"].value;
-var atpos=email.indexOf("@");
-var dotpos=email.lastIndexOf(".");
-
-if (atpos<1 || dotpos<atpos+2 || dotpos+2>=email.length)
-  {
-  alert("The e-mail address entered is not a valid e-mail address");
-  return false;
-  }
-  
-  return true; 
-  
-}
-</script>
-
-<h3> Change email </h3>
-
-<h3 style="color:red"><%= errorMessage %></h3>
-<form name="changeEmail" action="/changeEmail" onsubmit="return validateForm()" method="post">
-
-	new email: <input type="text" name="email" size="30"><br>
-	<input type="submit" value="change email"><br>
-
-</form>
+<div class="container">
+	<h3> Change email </h3>
+	<form class="form-horizontal" role="form" action="/changeEmail" method="post">
+		<div class="form-group">
+			<label for="email" class="col-sm-1 control-label">Email</label>
+	        <div class="col-sm-4">
+	            <input type="email" class="form-control" name="email" placeholder="Email@someplace.com">
+	        </div>
+		</div>
+		<div class="form-group">
+            <div class="col-sm-offset-1 col-sm-10">
+                <button type="submit" class="btn btn-default">Submit</button>
+            </div>
+        </div>
+	</form>
+</div>

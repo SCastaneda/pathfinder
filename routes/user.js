@@ -120,20 +120,29 @@ exports.createUser = function(req, res){
 	console.log(password);
 	console.log(email);
 
+	var usernamePattern=/^[-\w\.\$@\*\!]{1,30}$/;
+
+
 	//if a field is blank redirect him to new user page with an error message
 	if((username == '' || password == '' )
 		|| (passwordVerify ==''|| email == '')) 
 		{
 		
 		req.session.errorMessage = "All fields required";
-		res.redirect('/newuser');
+		res.redirect('/');
 	}
 
 	//else if passwords or emails dont match redirect them with an error
 	else if(password != passwordVerify){
 
 		req.session.errorMessage = "Password fields do not match";
-		res.redirect('/newuser');	
+		res.redirect('/');	
+	}
+
+
+	else if (!usernamePattern.test(username)) {
+		req.session.errorMessage = "Not a valid username";
+		res.redirect('/');
 	}
 
 	//otherwise check if user already exists, if they do give them a redirect and an error, otherwise put them into the database 
@@ -162,14 +171,14 @@ exports.createUser = function(req, res){
 				else{
 					console.log('email exists');
 					req.session.errorMessage = "Email already exists";
-					res.redirect('/newuser');
+					res.redirect('/');
 				}
 				});
 			}
 			else{
 				console.log('user exists');
 				req.session.errorMessage = "Username already exists";
-				res.redirect('/newuser');
+				res.redirect('/');
 			}
 			});
 	}
@@ -230,7 +239,7 @@ exports.getPassword = function(req, res){
 				smtpTransport.close();
 			});
 			req.session.errorMessage = "";
-			req.session.infoMessage = "Your password had been sent to your email address";
+			req.session.infoMessage = "Your password has been sent to your email address";
 			res.redirect('/');
 			}
 			else{
