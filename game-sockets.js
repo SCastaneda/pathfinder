@@ -3,10 +3,17 @@ function User(socket, name) {
     this.name   = name;
     this.room   = '';
 }
+
+function Challenge(challenger, challengee) {
+    this.challenger = challenger;
+    this.challengee = challengee;
+}
+
 var all_users_waiting = [];
 var all_users_playing = [];
 var all_users_lobby   = [];
 var maze_size = 5;
+var challenges = [];
 
 var sanitize = require('validator').sanitize;
 db_room      = require('./db/rooms');
@@ -42,6 +49,106 @@ exports.start = function(io, cookieParser, sessionStore) {
         // handles chat
         socket.on('send_message', function(data) { broadcast_message(data, user); });
 
+        socket.on('request_challenge', function(data) { send_challenge(data, user); });
+        socket.on('respond_challenge', function(data) { accept_challenge(data, user); });
+
+    }
+
+    function send_challenge(data, user) {
+        // make sure both users are in the lobby.
+        var found_challenger = false;
+        var found_challengee = false;
+        var challenger;
+        var challengee;
+
+        get_users_by_room('lobby', function(users) {
+            for(var i = 0; i < users.length; i++) {
+                if(users[i].name === user.name) {
+                    found_challenger = true;
+                    challenger = users[i];
+                } else if(users[i].name === data.to) {
+                    found_challengee = true;
+                    challengee = users[i];
+                }
+            }
+
+            if(found_challenger && found_challengee) {
+
+                // make sure user isn't somehow challenging themselves
+                if(challenger == challengee) {
+                    user.socket.emit('challenge_response', {status: false, message: "You shouldn't challenge yourself!"});
+                } else {
+
+                    check_availability_challenges(challengee, function(available) {
+                        if(available) {
+                            challenges.push(new Challenge(challenger, challengee));
+                            challengee.socket.emit('send_challenge', { challenger: challenger });
+                        } else {
+                            challenger.socket.emit('challenge_response', {status: false, message: "User has a pending challenge, try again later."})
+                        }
+                    });
+                }
+            } else {
+                user.socket.emit('challenge_response', { status: false, message: "Could not find the person you challenged in the lobby." });
+            }
+        });
+
+    }
+
+    // checks if this player is currently already being challenged
+    function check_availability_challenges(user, cb) {
+        for(var i = 0; i < challenges.length; i++) {
+            if(user == challenges[i].challengee) {
+                return cb(false);
+            }
+        }
+        return cb(true);
+    }
+
+    function verify_challenge(challenger, challengee, cb) {
+        for(var i = 0; i < challenges.length; i++) {
+            if(challenges[i].challenger == challenger && challenges[i].challengee == challengee) {
+                return cb(true);
+            }
+        }
+        return cb(false);
+    }
+
+    function respond_challenge(data, user) {
+        var challenger = data.challenger;
+        var challengee = user;
+
+        //verify challenge still exists
+        verify_challenge(challenger, challengee, function(status) {
+            if(status) {
+                // accepting challenge
+                if(data.response === true) {
+                    // dispatch
+                    db_room.create_room(challenger.name, challengee.name, function(hash) {
+                        challenger.socket.emit('challenge_response', {status: true, message: "Challenge accepted, dispatching you to game room."});
+                        challenger.socket.emit('dispatch_to_game', { hash: hash });
+                        challengee.socket.emit('dispatch_to_game', { hash: hash });
+
+                        console.log("FROM LOBBY! DISPATCHED " + challenger.name + " AND " + challengee.name + " to room " + hash);
+                    });
+                } else {
+                    // declined
+                    challenger.socket.emit('challenge_response', { status: false, message: challengee.name + " declined your challenge" });
+                }
+                delete_challenge(challenger, challenger);
+            } else {
+                challengee.socket.emit('dispatch', { status: false, message: "Challenge no longer valid" });
+            }
+        });
+
+    }
+
+    function delete_challenge(challenger, challengee) {
+        for(var i = 0; i < challenges.length; i++) {
+            if(challenges[i].challenger == challenger && challenges[i].challengee == challengee) {
+                challenges.splice(i, 1);
+            }
+        }
     }
 
     function broadcast_message(data, user) {
@@ -254,6 +361,8 @@ exports.start = function(io, cookieParser, sessionStore) {
                 
                 if(user.room === 'waiting') {
                     io.sockets.in('waiting').emit('update_total', { count: all_users_waiting.length });
+                } else if(user.room === 'lobby') {
+                    clear_users_challenges(user);                    
                 }
 
                 delete_user(user.name, function(deleted) {
@@ -267,6 +376,14 @@ exports.start = function(io, cookieParser, sessionStore) {
             }
         });
 
+    }
+
+    function clear_users_challenges(user) {
+        for(var i = 0; i < challenges.length; i++) {
+            if(challenges[i].challenger == user || challenges[i].challengee == user) {
+                challenges.splice(i, 1);
+            }
+        }
     }
 
     function update_lobby_users() {
