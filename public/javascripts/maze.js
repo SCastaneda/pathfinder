@@ -3,6 +3,10 @@ var start = true, end = true, disable_board_modify = false, current_turn = false
 var from_square = null, to_square = null;
 var other_current = null;
 var maze_size;
+var UP = 38;
+var DOWN = 40;
+var RIGHT = 39;
+var LEFT = 37;
 
 // edge map will hold all the connections, regardless if connected or not
 var edge_map = [];
@@ -448,4 +452,37 @@ function get_wall_id(from, to, dim) {
         }
     }
     return wall;
+}
+
+function moveFromKeyboard(code) {
+    switch (code) {
+        case UP:
+            if (from_square > 4) {
+                if (to_square) $("#o"+to_square).removeClass("selected");
+                to_square = from_square-5;
+                $("#o"+to_square).addClass("selected");
+            }
+            break;
+        case DOWN:
+            if (from_square < 20) {
+                if (to_square) $("#o"+to_square).removeClass("selected");
+                to_square = from_square+5;
+                $("#o"+to_square).addClass("selected");
+            }
+            break;
+        case RIGHT:
+            if (from_square % 5 != 4) {
+                if (to_square) $("#o"+to_square).removeClass("selected");
+                to_square = from_square+1;
+                $("#o"+to_square).addClass("selected");
+            }
+            break;
+        case LEFT:
+            if (from_square % 5 != 0) {
+                if (to_square) $("#o"+to_square).removeClass("selected");
+                to_square = from_square-1;
+                $("#o"+to_square).addClass("selected");
+            }
+            break;
+    }
 }
