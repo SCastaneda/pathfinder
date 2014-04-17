@@ -1,6 +1,7 @@
 var db = require('../db/user');
 var crypto = require('crypto');
 var nodemailer = require("nodemailer");
+var config_email = require('../config/email')
 
 exports.login = function(req, res){
 
@@ -205,8 +206,8 @@ exports.getPassword = function(req, res){
 			var smtpTransport = nodemailer.createTransport("SMTP", {
 				service: "Gmail",
 				auth:{
-					user: "pathmakers76@gmail.com",
-					pass: "pathmakers1234"
+					user: config_email.email,
+					pass: config_email.pw
 				}
 			});
 
