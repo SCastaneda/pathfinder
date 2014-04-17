@@ -1,6 +1,54 @@
 <!DOCTYPE html>
 <html lang='en'>
-    <head>
+		<head>
+
+		<script>
+		function validateForm()
+		{
+		var username=document.forms["registration"]["name"].value;
+		var newPassword=document.forms["registration"]["password"].value;
+		var verifyNewPassword=document.forms["registration"]["passwordVerify"].value;
+		var email=document.forms["registration"]["email"].value;
+		var atpos=email.indexOf("@");
+		var dotpos=email.lastIndexOf(".");
+		
+		var patt=/^[-\w\.\$@\*\!]{1,30}$/;
+		if(!patt.test(username)){
+			alert("Not a valid username");
+			return false;
+		}
+		
+		if(newPassword != verifyNewPassword){
+			alert("Password fields do not match");
+			return false;
+		}
+		
+		if (atpos<1 || dotpos<atpos+2 || dotpos+2>=email.length)
+		{
+			alert("The e-mail address entered is not a valid e-mail address");
+			return false;
+		}
+		
+		return true; 
+	  
+		}
+		
+		function vf(){
+		
+			var username=document.forms["logIn"]["name"].value;
+			
+			var patt=/^[-\w\.\$@\*\!]{1,30}$/;
+			if(!patt.test(username)){
+				alert("Not a valid username");
+				return false;
+			}
+		
+			return true;
+			
+		}
+		
+		</script>
+	
         <meta charset='utf-8'>
         <meta http-equiv='X-UA-Compatible" content="IE=edge'>
         <meta name='viewport' content='width=device-width, initial-scale=1'>
@@ -42,13 +90,17 @@
                     <li><a data-toggle="modal" data-target="#regModal">Register</a></li>
                     <li><a href="/emailpassword">Forgot Password</a></li>
                     <% } %>
+					<% if(session.loggedin) { %>
+					<li><a href="/changeEmail">Change Email</a></li>
+					<li><a href="/changePassword">Change Password</a></li>
+					<% } %>
                     </ul>
                     <% if(session.loggedin) { %>
                         <form class="navbar-form navbar-right" action="/logout" method="get" role="form">
                         <button class="btn btn-success">Logout</button>
                         </form>
                     <% } else { %>
-                        <form class="navbar-form navbar-right" action="/login" method="post" role="form">
+                        <form name="logIn" class="navbar-form navbar-right" action="/login" onsubmit="return vf()" method="post" role="form">
                             <div class="form-group">
                                   <input type="text" name="name" placeholder="Username" class="form-control">
                             </div>
@@ -90,7 +142,7 @@
                     </div>
                     <div class="modal-body">
 
-                        <form class="form-horizontal" role="form" method="post" action="/newuser">
+                        <form name="registration" class="form-horizontal" role="form" method="post" onsubmit="return validateForm()" action="/newuser">
                             <div class="form-group">
                                 <label for="name" class="col-sm-4 control-label" >Username</label>
                                 <div class="col-sm-8">
