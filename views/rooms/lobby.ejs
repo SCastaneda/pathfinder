@@ -72,6 +72,8 @@ socket.on('challenge_response', function(data) {
     var response = data.status;
     var message = data.message;
     console.log("response to your challenge:" + response + " message: " + message);
+    $("#notification-body").html(message);
+    $("#login-error").show();
 });
 
 

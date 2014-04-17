@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang='en'>
 		<head>
-
 		<script>
 		function validateForm()
 		{
@@ -116,14 +115,14 @@
 
         <div class="notification">
             <div class="alert fade in bg-danger" id="login-error" hidden>
-                <button type="button" class="close">×</button>
+                <button type="button" class="close" id="error-close">×</button>
                 <div id="notification-body"><% if(typeof session !== "undefined" && typeof session.errorMessage !== "undefined" && session.errorMessage !== ""){%><%=session.errorMessage%><%}%></div>
             </div>
         </div>
 
         <div class="notification">
             <div class="alert fade in bg-success" id="login-info" hidden>
-                <button type="button" class="close">×</button>
+                <button type="button" class="close" id="info-close">×</button>
                 <div id="info-body"><% if(typeof session !== "undefined" && typeof session.infoMessage !== "undefined" && session.infoMessage !== ""){%><%=session.infoMessage%><%}%></div>
             </div>
         </div>
@@ -186,7 +185,7 @@
 </html>
 
 <script type="text/javascript">
-    $(document).ready(function(){
+     $(document).ready(function(){
         if (!$("#notification-body").is(':empty')) {
             $("#login-error").show();
         }
@@ -195,7 +194,13 @@
         }
     });
 
-    $('.alert .close').click(function() {
+    $('#error-close').click(function() {
+        $("#notification-body").empty();
+        $(this).parent().hide();
+    });
+
+    $('#info-close').click(function() {
+        $("#info-body").empty();
         $(this).parent().hide();
     });
 </script>
