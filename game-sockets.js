@@ -89,7 +89,11 @@ exports.start = function(io, cookieParser, sessionStore) {
                     });
                 }
             } else {
-                user.socket.emit('challenge_response', { status: false, message: "Could not find the person you challenged in the lobby." });
+                if(data.challengee == user.name) {
+                    user.socket.emit('challenge_response', {status: false, message: "You shouldn't challenge yourself!"});
+                } else {
+                    user.socket.emit('challenge_response', { status: false, message: "Could not find the person you challenged in the lobby." });
+                }
             }
         });
 

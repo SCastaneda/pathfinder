@@ -20,6 +20,24 @@
         </div>
 	</div>
 </div>
+
+<div id="challenge_modal" class="modal fade" id="regModal" tabindex="-1" role="dialog" aria-labelledby="regModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">
+                    New challenge!
+                </h4>
+            </div>
+            <div class="modal-body">
+
+                
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="/socket.io/socket.io.js"></script>
 <script type="text/javascript">
 var socket = io.connect("");
@@ -35,11 +53,15 @@ socket.on('dispatch_to_game', join_game);
 // you are being challenged by another user
 socket.on('send_challenge', function(data) {
     var challenger = data.challenger;
+    $('#challenge_modal .modal-body').html("You have been challenged by " + challenger + "<br><br><br><button class='btn btn-success' onclick='respond_to_challenge(\"" + challenger + "\", true)'>Accept</button> " + 
+        "<button class='btn btn-danger' onclick='respond_to_challenge(\"" + challenger + "\", false)'>Decline</button> ");
+    $('#challenge_modal').modal('show');
     console.log("You are being challenged by: " + challenger);
 });
 
 function respond_to_challenge(name, response) {
     socket.emit('respond_challenge', {response: response, challenger: name});
+    $('#challenge_modal').modal('hide');
 }
 
 function challenge_user(name) {
@@ -58,8 +80,6 @@ function join_game(data) {
     window.location.replace("/play/" + data.hash);
 }
 
-
-
 function update_user_list(data) {
     console.log(data);
     $('#lobbyUserList').html(" ");
@@ -70,13 +90,14 @@ function update_user_list(data) {
     				.attr("data-container", "body")
     				.attr("data-toggle", "popover")
     				.attr("data-placement", "left")
-    				.attr("data-content", "Challenge " + data.users[i])
+    				.attr("data-content", "Challenge <a href='#' onclick='challenge_user(\"" + data.users[i] + "\");'>" + data.users[i] + "</a>")
     				.append(data.users[i]);
 
     	$('#lobbyUserList').append(user);
         $('#lobbyUserList').scrollTop($('#lobbyUserList')[0].scrollHeight);
     }
-    $('.challenge').popover();
+    $('.challenge').popover({html:true, trigger:'hover', delay: {hide:1500}});
+
 }
 
 
