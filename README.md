@@ -9,7 +9,7 @@ Play with your friends [here](http://pathfinder.sam-the-man.com)
 **Note:**
 The game is still in development, and will have some kinks in it, feel free to report them via Issues.
 
-###To Start
+### To Start
 To run the server on your local machine, first start the database.
 If you installed mongodb correctly, you should be able to run
 `mongod`
@@ -18,7 +18,7 @@ This will start the mongo server and you will need to leave it open, open up ano
 navigate to the project folder and run the following to run the application:
 `node app.js`
 
-###Installation
+### Installation
 To run this on our local machine, we will need the following:
 
 First, make sure your git is properly installed, and you have your ssh key configured for your machine.
